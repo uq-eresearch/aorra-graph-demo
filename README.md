@@ -3,7 +3,7 @@
 ## Build & Run ##
 
 ```sh
-$ cd AORRA_Graph_Demo
+$ cd aorra-graph-demo
 $ ./sbt
 > container:start
 > browse
