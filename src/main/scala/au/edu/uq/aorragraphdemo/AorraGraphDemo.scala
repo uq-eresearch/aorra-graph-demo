@@ -12,13 +12,18 @@ import ereefs.images._
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
   get("/") {
+    var progressChartUrl = relativeUrl("progress-chart", Map(
+      "tl" -> "Horticulture",
+      "tr" -> "2013 targets",
+      "value" -> "42"
+    ))
     <html>
 	  <head>
 	  	<title>AORRA Graph Demo</title>
 	  </head>
 	  <body>
 	  	<ul>
-	  	  <li><a href="progress-chart?value=42">Progress Bar</a></li>
+	  	  <li><a href={progressChartUrl}>Progress Bar</a></li>
 	  	</ul>
 	  </body>
 	</html>
