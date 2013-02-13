@@ -18,16 +18,42 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
   }
 
   get("/sugarcane-practice-chart") {
-    val dsBuilder = new CategoryDatasetBuilder()
-    Seq("A","B","C","D") foreach { l =>
-      Seq("08","09") foreach { n =>
-        Seq("Nutrients", "Herbicides", "Soil") foreach { category =>
-          val series = s"${l}_${n}"
-          dsBuilder.addValue(25.0, series, category)
-        }
-      }
-    }
-    val dataset = dsBuilder.get()
+    val nutrients = "Nutrients";
+    val herbicides = "Herbicides";
+    val soil = "Soil";
+
+    val builder = new CategoryDatasetBuilder()
+    builder
+    .addValue(21.0, "A_08", nutrients)
+    .addValue(19.0, "B_08", nutrients)
+    .addValue(37.0, "C_08", nutrients)
+    .addValue(23.0, "D_08", nutrients)
+    .addValue(21.0, "A_09", nutrients)
+    .addValue(28.0, "B_09", nutrients)
+    .addValue(32.0, "C_09", nutrients)
+    .addValue(19.0, "D_09", nutrients);
+
+    builder
+    .addValue(28.0, "A_08", herbicides)
+    .addValue(50.0, "B_08", herbicides)
+    .addValue(16.0, "C_08", herbicides)
+    .addValue( 6.0, "D_08", herbicides)
+    .addValue(23.0, "A_09", herbicides)
+    .addValue(53.0, "B_09", herbicides)
+    .addValue(20.0, "C_09", herbicides)
+    .addValue( 4.0, "D_09", herbicides);
+
+    builder
+    .addValue(30.0, "A_08", soil)
+    .addValue(40.0, "B_08", soil)
+    .addValue(19.0, "C_08", soil)
+    .addValue(11.0, "D_08", soil)
+    .addValue(27.0, "A_09", soil)
+    .addValue(35.0, "B_09", soil)
+    .addValue(29.0, "C_09", soil)
+    .addValue(09.0, "D_09", soil);
+
+    val dataset = builder.get()
     val chart = ChartFactory.getSugarcanePracticeChart(
         new Dimension(500, 500),
         dataset)
