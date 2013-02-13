@@ -13,56 +13,8 @@ import ereefs.images._
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
   get("/") {
-    <html>
-      <head>
-        <title>AORRA Graph Demo</title>
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-        <style type="text/css">
-        <![CDATA[
-        form label {
-            display: inline-block;
-            width: 6em;
-        }
-        ]]>
-        </style>
-      </head>
-      <body>
-        <h1>Chart Examples</h1>
-        <form id="progress-chart">
-          <fieldset>
-            <legend>Progress Chart</legend>
-            <label for="tl">Top Left Text</label>
-            <input type="text" name="tl" value="Horticulture"/><br/>
-            <label for="tr">Top Right Text</label>
-            <input type="text" name="tr" value="2013 targets"/><br/>
-            <label for="value">Value</label>
-            <input type="text" name="value" value="42"/><br/>
-            <label for="max">Max</label>
-            <input type="text" name="max" value="100"/><br/>
-            <label for="width">Dimensions</label>
-            <input type="text" name="width" size="3"/> &times;
-            <input type="text" name="height" size="3"/><br/>
-            <button type="submit">Render</button>
-            <hr />
-            <img/>
-          </fieldset>
-        </form>
-        <fieldset>
-          <legend>Sugar Practice Chart</legend>
-          <img src="sugarcane-practice-chart"/>
-        </fieldset>
-        <script type="text/javascript">
-        <![CDATA[
-        $('#progress-chart').submit(function() {
-          var serialize = $(this).serialize();
-          $(this).find('img').attr('src', 'progress-chart?'+serialize);
-          return false;
-        });
-        $('#progress-chart').submit();
-        ]]>
-        </script>
-      </body>
-    </html>
+    contentType = "text/html"
+    mustache("/index")
   }
 
   get("/sugarcane-practice-chart") {
