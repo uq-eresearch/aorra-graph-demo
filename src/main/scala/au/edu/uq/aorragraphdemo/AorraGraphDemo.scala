@@ -6,6 +6,7 @@ import scalate.ScalateSupport
 import java.awt.Dimension
 import java.io.ByteArrayOutputStream
 
+import ereefs.content.Content
 import ereefs.charts._
 import ereefs.images._
 
@@ -22,11 +23,34 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 	  	<title>AORRA Graph Demo</title>
 	  </head>
 	  <body>
+    	<h1>Chart Examples</h1>
 	  	<ul>
-	  	  <li><a href={progressChartUrl}>Progress Bar</a></li>
+	  	  <li><a href={progressChartUrl}>Progress Chart</a></li>
+	  	  <li><a href="sugarcane-practice-chart">Sugar Practice Chart</a></li>
 	  	</ul>
 	  </body>
 	</html>
+  }
+
+  get("/sugarcane-practice-chart") {
+    val dsBuilder = new CategoryDatasetBuilder()
+    Seq("A","B","C","D") foreach { l =>
+	  Seq("08","09") foreach { n =>
+        Seq("Nutrients", "Herbicides", "Soil") foreach { category =>
+          val series = s"${l}_${n}"
+          dsBuilder.addValue(25.0, series, category)
+        }
+      }
+    }
+    val dataset = dsBuilder.get()
+    val chart = ChartFactory.getSugarcanePracticeChart(
+        new Dimension(500, 500),
+        dataset)
+
+    val content = new ChartContentWrapper(chart)
+    contentType = content.getContentType
+    transformToBytes(content)
+
   }
 
   get("/progress-chart") {
@@ -61,7 +85,7 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
         paramOption("height") getOrElse d.getHeight.toInt)
   }
 
-  private def transformToBytes(content: ImageContent) = {
+  private def transformToBytes(content: Content) = {
   	val byteStream = new ByteArrayOutputStream()
     content.write(byteStream)
     byteStream.toByteArray
