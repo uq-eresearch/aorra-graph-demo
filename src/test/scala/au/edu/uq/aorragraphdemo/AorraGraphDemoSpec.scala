@@ -1,16 +1,36 @@
 package au.edu.uq.aorragraphdemo
 
-import org.scalatra.test.specs2._
+import org.scalatra.test.scalatest._
 
-// For more on Specs2, see http://etorreborre.github.com/specs2/guide/org.specs2.guide.QuickStart.html
-class AorraGraphDemoSpec extends ScalatraSpec { def is =
-  "GET / on AorraGraphDemo"                     ^
-    "should return status 200"                  ! root200^
-                                                end
+class AorraGraphDemoSpec extends ScalatraSpec {
 
   addFilter(classOf[AorraGraphDemo], "/*")
 
-  def root200 = get("/") {
-    status must_== 200
+  describe("Demo Application") {
+    describe("GET /") {
+      it("should return status 200") {
+        get("/") {
+          status should equal (200)
+        }
+      }
+    }
+
+    describe("GET /progress-chart") {
+      it("should return status 400") {
+        get("/progress-chart") {
+          status should equal (400)
+        }
+      }
+
+      describe("with value=42") {
+        it("should return status 200") {
+          get("/progress-chart?value=42") {
+            status should equal (400)
+          }
+        }
+      }
+    }
+
   }
+
 }
