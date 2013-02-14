@@ -25,7 +25,7 @@ class AorraGraphDemoSpec extends ScalatraSpec {
       describe("with value=42") {
         it("should return status 200") {
           get("/progress-chart?value=42") {
-            status should equal (400)
+            status should equal (200)
           }
         }
       }
