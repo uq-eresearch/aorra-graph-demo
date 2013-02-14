@@ -37,8 +37,8 @@ public class ProgressChart implements Dimensions {
     private static final Color PROGRESS_COLOR = new Color(24,62,115);
     private static final int BAR_HEIGHT = 20;
 
-    private static final Font FONT1 = new Font("Arial", Font.PLAIN, 12);
-    private static final Font FONT2 = new Font("Arial", Font.BOLD, 16);
+    private static final Font FONT1 = new Font("Liberation Sans", Font.PLAIN, 12);
+    private static final Font FONT2 = new Font("Liberation Sans", Font.BOLD, 16);
 
     private Dimension dimension;
 
@@ -119,7 +119,7 @@ public class ProgressChart implements Dimensions {
         g2.setColor(PROGRESS_COLOR);
         if(pLength>0) {
             g.fillArc(lx, ly+Math.round(capR), capR, 90, 180);
-            // if the arc radius is bigger then the progress length then 
+            // if the arc radius is bigger then the progress length then
             // draw a white box on part of the arc to overwrite some of the fill.
             // TODO might be an issue with transparency,
             // think about using a fill cord instead (see Arc2D)
@@ -148,7 +148,7 @@ public class ProgressChart implements Dimensions {
         g.drawArc(lx, ly+Math.round(capR), capR, 90, 180, Arc2D.OPEN);
         g.drawArc(rx, ry+Math.round(capR), capR, -90, 180, Arc2D.OPEN);
         g2.setColor(Color.white);
-        
+
         g2.setFont(new Font("Arial", Font.BOLD, 12));
         if(progressLabel!=null) {
             TextUtilities.drawAlignedString(String.format("%s", progressLabel),
@@ -229,7 +229,7 @@ public class ProgressChart implements Dimensions {
         this.bottomRightLabel = bottomRightLabel;
     }
 
-    
+
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
@@ -250,13 +250,13 @@ public class ProgressChart implements Dimensions {
                     {
                         setBorder(BorderFactory.createLineBorder(Color.black));
                     }
-                    
+
                     @Override
                     public Dimension getPreferredSize() {
 //                        return chart.getDimension();
                         return new Dimension(300, 100);
                     }
-                    
+
                     @Override
                     public void paintComponent(Graphics g) {
                         super.paintComponent(g);
