@@ -13,8 +13,11 @@ import ereefs.images._
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
   get("/") {
+    val runtime = Map(
+        "name" -> System.getProperty("java.runtime.name"),
+        "version" -> System.getProperty("java.runtime.version"))
     contentType = "text/html"
-    mustache("/index")
+    mustache("/index", "runtime" -> runtime)
   }
 
   get("/sugarcane-practice-chart") {
