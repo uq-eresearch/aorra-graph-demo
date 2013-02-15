@@ -8,6 +8,13 @@
         display: inline-block;
         width: 6em;
     }
+    table tbody th {
+      width: 6em;
+    }
+    #land-practice-chart td input {
+      text-align: right;
+      width: 4em;
+    }
     </style>
   </head>
   <body>
@@ -31,17 +38,78 @@
         <img/>
       </fieldset>
     </form>
-    <fieldset>
-      <legend>Sugar Practice Chart</legend>
-      <img src="sugarcane-practice-chart"/>
-    </fieldset>
+    <form id="land-practice-chart">
+      <fieldset>
+        <legend>Land Practice Chart</legend>
+        <label for="tl">Title</label>
+        <input type="text" name="title" value="Sugarcane Practices Chart"/><br/>
+        <table>
+          <thead>
+            <tr>
+              <th> </th>
+              <th colspan="4">Previous</th>
+              <th colspan="4">Current</th>
+            </tr>
+            <tr>
+              <th> </th>
+              <th>A</th><th>B</th><th>C</th><th>D</th>
+              <th>A</th><th>B</th><th>C</th><th>D</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Nutrients</th>
+              <!-- Previous -->
+              <td><input name="NpA" value="21.0"></td>
+              <td><input name="NpB" value="19.0"/></td>
+              <td><input name="NpC" value="37.0"/></td>
+              <td><input name="NpD" value="23.0"/></td>
+              <!-- Current -->
+              <td><input name="NcA" value="21.0"/></td>
+              <td><input name="NcB" value="28.0"/></td>
+              <td><input name="NcC" value="32.0"/></td>
+              <td><input name="NcD" value="19.0"/></td>
+            </tr>
+            <tr>
+              <th>Herbicides</th>
+              <!-- Previous -->
+              <td><input name="HpA" value="28.0"/></td>
+              <td><input name="HpB" value="50.0"/></td>
+              <td><input name="HpC" value="16.0"/></td>
+              <td><input name="HpD" value="6.0"/></td>
+              <!-- Current -->
+              <td><input name="HcA" value="23.0"/></td>
+              <td><input name="HcB" value="53.0"/></td>
+              <td><input name="HcC" value="20.0"/></td>
+              <td><input name="HcD" value="4.0"/></td>
+            </tr>
+            <tr>
+              <th>Soil</th>
+              <!-- Previous -->
+              <td><input name="SpA" value="30.0"/></td>
+              <td><input name="SpB" value="40.0"/></td>
+              <td><input name="SpC" value="19.0"/></td>
+              <td><input name="SpD" value="11.0"/></td>
+              <!-- Current -->
+              <td><input name="ScA" value="27.0"/></td>
+              <td><input name="ScB" value="35.0"/></td>
+              <td><input name="ScC" value="29.0"/></td>
+              <td><input name="ScD" value="9.0"/></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="submit">Render</button>
+        <hr/>
+        <img src="land-practice-chart"/>
+      </fieldset>
+    </form>
     <script type="text/javascript">
-    $('#progress-chart').submit(function() {
+    $('form').submit(function() {
       var serialize = $(this).serialize();
-      $(this).find('img').attr('src', 'progress-chart?'+serialize);
+      $(this).find('img').attr('src', $(this).attr('id')+'?'+serialize);
       return false;
     });
-    $('#progress-chart').submit();
+    $('button[type="submit"]').click();
     </script>
     <footer>Running on {{#runtime}}{{name}} {{version}}{{/runtime}}</footer>
   </body>

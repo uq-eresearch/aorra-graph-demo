@@ -1,14 +1,20 @@
 package au.edu.uq.aorragraphdemo
 
+import scala.collection.immutable.ListMap
 import org.scalatra._
 import scalate.ScalateSupport
-
 import java.awt.Dimension
 import java.io.ByteArrayOutputStream
-
+import org.jfree.data.category.CategoryDataset
+import org.jfree.chart.title.TextTitle
+import au.edu.uq.aorra.charts._
+import ereefs.charts.Configuration.TITLE_FONT
 import ereefs.content.Content
-import ereefs.charts._
+import ereefs.charts.{
+  CategoryDatasetBuilder, ChartContentWrapper, ChartRenderer,
+  DimensionsWrapper, ProgressChart, ProgressChartBuilder}
 import ereefs.images._
+import java.util.NoSuchElementException
 
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
@@ -20,46 +26,55 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     mustache("/index", "runtime" -> runtime)
   }
 
-  get("/sugarcane-practice-chart") {
-    val nutrients = "Nutrients";
-    val herbicides = "Herbicides";
-    val soil = "Soil";
+  get("/land-practice-chart") {
+    val paramMap = landParamMap()
 
-    val builder = new CategoryDatasetBuilder()
-    builder
-    .addValue(21.0, "A_08", nutrients)
-    .addValue(19.0, "B_08", nutrients)
-    .addValue(37.0, "C_08", nutrients)
-    .addValue(23.0, "D_08", nutrients)
-    .addValue(21.0, "A_09", nutrients)
-    .addValue(28.0, "B_09", nutrients)
-    .addValue(32.0, "C_09", nutrients)
-    .addValue(19.0, "D_09", nutrients);
+    val data = multiParams.keys
+        .filter(k => paramMap.contains(k))
+        .map({ k =>
+          val v1 = paramMap.get(k).get
+          val v2 = multiParams.get(k) match {
+            case Some(Seq(x, _*)) => x.toDouble
+          }
+          (v1, v2)
+        }).toMap
 
-    builder
-    .addValue(28.0, "A_08", herbicides)
-    .addValue(50.0, "B_08", herbicides)
-    .addValue(16.0, "C_08", herbicides)
-    .addValue( 6.0, "D_08", herbicides)
-    .addValue(23.0, "A_09", herbicides)
-    .addValue(53.0, "B_09", herbicides)
-    .addValue(20.0, "C_09", herbicides)
-    .addValue( 4.0, "D_09", herbicides);
+    /*
+    val data = ListMap( // Important that iteration happens in order
+        (Reading.Nutrients, Group.Previous, Rating.A) -> 21.0,
+        (Reading.Nutrients, Group.Previous, Rating.B) -> 19.0,
+        (Reading.Nutrients, Group.Previous, Rating.C) -> 37.0,
+        (Reading.Nutrients, Group.Previous, Rating.D) -> 23.0,
+        (Reading.Nutrients, Group.Current, Rating.A) -> 21.0,
+        (Reading.Nutrients, Group.Current, Rating.B) -> 28.0,
+        (Reading.Nutrients, Group.Current, Rating.C) -> 32.0,
+        (Reading.Nutrients, Group.Current, Rating.D) -> 19.0,
+        (Reading.Herbicides, Group.Previous, Rating.A) -> 28.0,
+        (Reading.Herbicides, Group.Previous, Rating.B) -> 50.0,
+        (Reading.Herbicides, Group.Previous, Rating.C) -> 16.0,
+        (Reading.Herbicides, Group.Previous, Rating.D) ->  6.0,
+        (Reading.Herbicides, Group.Current, Rating.A) -> 23.0,
+        (Reading.Herbicides, Group.Current, Rating.B) -> 53.0,
+        (Reading.Herbicides, Group.Current, Rating.C) -> 20.0,
+        (Reading.Herbicides, Group.Current, Rating.D) ->  4.0,
+        (Reading.Soil, Group.Previous, Rating.A) -> 30.0,
+        (Reading.Soil, Group.Previous, Rating.B) -> 40.0,
+        (Reading.Soil, Group.Previous, Rating.C) -> 19.0,
+        (Reading.Soil, Group.Previous, Rating.D) -> 11.0,
+        (Reading.Soil, Group.Current, Rating.A) -> 27.0,
+        (Reading.Soil, Group.Current, Rating.B) -> 35.0,
+        (Reading.Soil, Group.Current, Rating.C) -> 29.0,
+        (Reading.Soil, Group.Current, Rating.D) -> 09.0)*/
 
-    builder
-    .addValue(30.0, "A_08", soil)
-    .addValue(40.0, "B_08", soil)
-    .addValue(19.0, "C_08", soil)
-    .addValue(11.0, "D_08", soil)
-    .addValue(27.0, "A_09", soil)
-    .addValue(35.0, "B_09", soil)
-    .addValue(29.0, "C_09", soil)
-    .addValue(09.0, "D_09", soil);
+    val title = try {
+      params("title")
+    } catch {
+      case _: NoSuchElementException => "Land Practices Chart"
+    }
 
-    val dataset = builder.get()
-    val chart = ChartFactory.getSugarcanePracticeChart(
+    val chart = createLandPracticeChart(
         new Dimension(500, 500),
-        dataset)
+        data, title)
 
     val content = new ChartContentWrapper(chart)
     contentType = content.getContentType
@@ -84,6 +99,38 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     val content = chartImageContent(renderer)
     contentType = content.getContentType
     transformToBytes(content)
+  }
+
+  private def landParamMap() = {
+    import ChartData._
+    val mappings = (
+      Seq(
+        'N' -> Reading.Nutrients,
+        'H' -> Reading.Herbicides,
+        'S' -> Reading.Soil),
+      Seq(
+        'p' -> Group.Previous,
+        'c' -> Group.Current),
+      Rating.values.map(r => (s"$r".charAt(0), r))
+    )
+    // Should build an param => key sequence. eg.
+    //   Seq(("NpA", (Reading.Nutrients, Group.Previous, Rating.A)), ...)
+    val ptups = for (re <- mappings._1; g <- mappings._2; r8 <- mappings._3)
+      yield (""+re._1+g._1+r8._1, (re._2, g._2, r8._2))
+    // Output as map
+    ptups.toMap
+  }
+
+  private def createLandPracticeChart(
+       dimension: Dimension,
+       data: Map[ChartData.LandPracticeDataKey, Double],
+       title: String) = {
+    val renderer = new au.edu.uq.aorra.charts.BarLegendRenderer
+    val chart = new LandPracticeChart(renderer)
+    val result = chart.createChart(data);
+    result.addSubtitle(new TextTitle(title, TITLE_FONT))
+    val wrapper = new DimensionsWrapper(result, dimension)
+    wrapper
   }
 
   private def chartImageContent(renderer: ChartRenderer) = {
