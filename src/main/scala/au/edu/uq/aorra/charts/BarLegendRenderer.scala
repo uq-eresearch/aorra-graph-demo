@@ -14,15 +14,16 @@ import org.jfree.data.category.CategoryDataset
 import ereefs.charts.GraphUtils
 import ereefs.charts.Configuration.LEGEND_FONT
 
-class BarLegendRenderer extends GroupedStackedBarRenderer {
+class BarLegendRenderer(periodLabels: (String, String))
+    extends GroupedStackedBarRenderer {
 
-  private var legend = HashMap[(Int, Int),String](
-    (3, 0) -> "Nutrients 2008-2009",
-    (7, 0) -> "Nutrients 2009-2010",
-    (3, 1) -> "Herbicides 2008-2009",
-    (7, 1) -> "Herbicides 2009-2010",
-    (3, 2) -> "Soil 2008-2009",
-    (7, 2) -> "Soil 2009-2010"
+  private def legend = HashMap[(Int, Int),String] (
+    (3, 0) -> s"Nutrients ${periodLabels._1}",
+    (7, 0) -> s"Nutrients ${periodLabels._2}",
+    (3, 1) -> s"Herbicides ${periodLabels._1}",
+    (7, 1) -> s"Herbicides ${periodLabels._2}",
+    (3, 2) -> s"Soil ${periodLabels._1}",
+    (7, 2) -> s"Soil ${periodLabels._2}"
   )
 
   override def drawItem(

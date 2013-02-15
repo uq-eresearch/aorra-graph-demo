@@ -39,42 +39,18 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
           (v1, v2)
         }).toMap
 
-    /*
-    val data = ListMap( // Important that iteration happens in order
-        (Reading.Nutrients, Group.Previous, Rating.A) -> 21.0,
-        (Reading.Nutrients, Group.Previous, Rating.B) -> 19.0,
-        (Reading.Nutrients, Group.Previous, Rating.C) -> 37.0,
-        (Reading.Nutrients, Group.Previous, Rating.D) -> 23.0,
-        (Reading.Nutrients, Group.Current, Rating.A) -> 21.0,
-        (Reading.Nutrients, Group.Current, Rating.B) -> 28.0,
-        (Reading.Nutrients, Group.Current, Rating.C) -> 32.0,
-        (Reading.Nutrients, Group.Current, Rating.D) -> 19.0,
-        (Reading.Herbicides, Group.Previous, Rating.A) -> 28.0,
-        (Reading.Herbicides, Group.Previous, Rating.B) -> 50.0,
-        (Reading.Herbicides, Group.Previous, Rating.C) -> 16.0,
-        (Reading.Herbicides, Group.Previous, Rating.D) ->  6.0,
-        (Reading.Herbicides, Group.Current, Rating.A) -> 23.0,
-        (Reading.Herbicides, Group.Current, Rating.B) -> 53.0,
-        (Reading.Herbicides, Group.Current, Rating.C) -> 20.0,
-        (Reading.Herbicides, Group.Current, Rating.D) ->  4.0,
-        (Reading.Soil, Group.Previous, Rating.A) -> 30.0,
-        (Reading.Soil, Group.Previous, Rating.B) -> 40.0,
-        (Reading.Soil, Group.Previous, Rating.C) -> 19.0,
-        (Reading.Soil, Group.Previous, Rating.D) -> 11.0,
-        (Reading.Soil, Group.Current, Rating.A) -> 27.0,
-        (Reading.Soil, Group.Current, Rating.B) -> 35.0,
-        (Reading.Soil, Group.Current, Rating.C) -> 29.0,
-        (Reading.Soil, Group.Current, Rating.D) -> 09.0)*/
 
-    val title = try {
-      params("title")
+    def paramOrBlank(k: String) = try {
+      params(k)
     } catch {
-      case _: NoSuchElementException => "Land Practices Chart"
+      case _: NoSuchElementException => ""
     }
 
     val chart = createLandPracticeChart(
         new Dimension(500, 500),
-        data, title)
+        data,
+        paramOrBlank("title"),
+        (paramOrBlank("pLabel"),paramOrBlank("cLabel")))
 
     val content = new ChartContentWrapper(chart)
     contentType = content.getContentType
@@ -124,8 +100,9 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
   private def createLandPracticeChart(
        dimension: Dimension,
        data: Map[ChartData.LandPracticeDataKey, Double],
-       title: String) = {
-    val renderer = new au.edu.uq.aorra.charts.BarLegendRenderer
+       title: String,
+       periodLabels: (String, String)) = {
+    val renderer = new au.edu.uq.aorra.charts.BarLegendRenderer(periodLabels)
     val chart = new LandPracticeChart(renderer)
     val result = chart.createChart(data);
     result.addSubtitle(new TextTitle(title, TITLE_FONT))
