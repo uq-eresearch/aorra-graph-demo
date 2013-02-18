@@ -8,11 +8,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -36,9 +38,6 @@ public class ProgressChart implements Dimensions {
 
     private static final Color PROGRESS_COLOR = new Color(24,62,115);
     private static final int BAR_HEIGHT = 20;
-
-    private static final Font FONT1 = new Font("Liberation Sans", Font.PLAIN, 12);
-    private static final Font FONT2 = new Font("Liberation Sans", Font.BOLD, 16);
 
     private Dimension dimension;
 
@@ -66,14 +65,17 @@ public class ProgressChart implements Dimensions {
     }
 
     private TableBox getChartBox() {
-        TableCellBox cellTL = new TableCellBox(new TextBox(topLeftLabel, FONT2));
+        registerFonts();
+        Font largeFont = getLargeFont();
+        Font regularFont = getRegularFont();
+        TableCellBox cellTL = new TableCellBox(new TextBox(topLeftLabel, largeFont));
         cellTL.setWidth(225);
         cellTL.getMargin().setBottom(3);
-        TableCellBox cellTR = new TableCellBox(new TextBox(topRightLabel, FONT1));
+        TableCellBox cellTR = new TableCellBox(new TextBox(topRightLabel, regularFont));
         cellTR.setAlign(Align.CENTER);
         cellTR.setValign(VAlign.BOTTOM);
-        TableCellBox cellBL = new TableCellBox(new TextBox(bottomLeftLabel, FONT1));
-        TableCellBox cellBR = new TableCellBox(new TextBox(bottomRightLabel, FONT1));
+        TableCellBox cellBL = new TableCellBox(new TextBox(bottomLeftLabel, regularFont));
+        TableCellBox cellBR = new TableCellBox(new TextBox(bottomRightLabel, regularFont));
         cellBR.setAlign(Align.CENTER);
         TableRowBox row1 = new TableRowBox();
         TableRowBox row2 = new TableRowBox();
@@ -227,6 +229,30 @@ public class ProgressChart implements Dimensions {
 
     public void setBottomRightLabel(String bottomRightLabel) {
         this.bottomRightLabel = bottomRightLabel;
+    }
+
+    protected void registerFonts() {
+        final InputStream fontStream1 = getClass().getResourceAsStream(
+                "LiberationSans-Regular.ttf");
+        final InputStream fontStream2 = getClass().getResourceAsStream(
+                "LiberationSans-Bold.ttf");
+        final GraphicsEnvironment ge =
+                GraphicsEnvironment.getLocalGraphicsEnvironment();
+        try {
+            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT,fontStream1));
+            ge.registerFont(Font.createFont(Font.TRUETYPE_FONT,fontStream2));
+        } catch (Exception e) {
+            // It's in the classpath, so failure should never happen
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected Font getRegularFont() {
+        return new Font("Liberation Sans", Font.PLAIN, 12);
+    }
+
+    protected Font getLargeFont() {
+        return new Font("Liberation Sans", Font.BOLD, 16);
     }
 
 
