@@ -2,114 +2,207 @@
 <html>
   <head>
     <title>AORRA Graph Demo</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
     <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
     <style type="text/css">
-    form label {
-        display: inline-block;
-        width: 6em;
-    }
-    table tbody th {
-      width: 6em;
-    }
     #land-practice-chart td input {
       text-align: right;
-      width: 4em;
+
     }
+
+    table .control-label {
+      margin-right: 18px;
+    }
+
     </style>
   </head>
   <body>
+    <div class="container-fluid">
     <h1>Chart Examples</h1>
-    <form id="progress-chart">
+    <form id="progress-chart" class="form-horizontal">
       <fieldset>
         <legend>Progress Chart</legend>
-        <label for="tl">Top Left Text</label>
-        <input type="text" name="tl" value="Horticulture"/><br/>
-        <label for="tr">Top Right Text</label>
-        <input type="text" name="tr" value="2013 targets"/><br/>
-        <label for="value">Value</label>
-        <input type="text" name="value" value="42"/><br/>
-        <label for="max">Max</label>
-        <input type="text" name="max" value="100"/><br/>
-        <label for="width">Dimensions</label>
-        <input type="text" name="width" size="3"/> &times;
-        <input type="text" name="height" size="3"/><br/>
-        <button type="submit">Render</button>
-        <hr />
-        <img/>
+        <div class="row">
+          <div class="span6">
+            <div class="control-group">
+              <label class="control-label" for="tl">Top Left Text</label>
+              <div class="controls">
+                <input class="span3" type="text" name="tl" value="Horticulture"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="tr">Top Right Text</label>
+              <div class="controls">
+                <input class="span3" type="text" name="tr" value="2013 targets"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="value">Value</label>
+              <div class="controls">
+                <div class="input-append">
+                  <input class="span1 text-right"
+                    type="text" name="value" value="42"/>
+                  <span class="add-on">%</span>
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="max">Max</label>
+              <div class="controls">
+                <div class="input-append">
+                  <input class="span1 text-right"
+                    type="text" name="max" value="100"/>
+                  <span class="add-on">%</span>
+                </div>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="width">Dimensions</label>
+              <div class="controls">
+                <div class="input-append">
+                  <input class="span1 text-right" type="text" name="width"/>
+                  <span class="add-on">px</span>
+                </div>
+                &times;
+                <div class="input-append">
+                  <input class="span1 text-right" type="text" name="height"/>
+                  <span class="add-on">px</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="span6">
+            <img/>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button class="btn" type="submit">Render</button>
+          </div>
+        </div>
       </fieldset>
     </form>
-    <form id="land-practice-chart">
+    <form id="land-practice-chart" class="form-horizontal">
       <fieldset>
         <legend>Land Practice Chart</legend>
-        <label for="title">Title</label>
-        <input type="text" name="title" value="Sugarcane Practices Chart"/><br/>
-        <label for="pLabel">Previous</label>
-        <input type="text" name="pLabel" value="2008-2009"/><br/>
-        <label for="cLabel">Current</label>
-        <input type="text" name="cLabel" value="2009-2010"/><br/>
-        <table>
-          <thead>
-            <tr>
-              <th> </th>
-              <th colspan="4">Previous</th>
-              <th> </th>
-              <th colspan="4">Current</th>
-            </tr>
-            <tr>
-              <th> </th>
-              <th>A</th><th>B</th><th>C</th><th>D</th>
-              <th>&nbsp;&nbsp;&nbsp;&nbsp;</th>
-              <th>A</th><th>B</th><th>C</th><th>D</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th>Nutrients</th>
-              <!-- Previous -->
-              <td><input name="NpA" value="21.0"></td>
-              <td><input name="NpB" value="19.0"/></td>
-              <td><input name="NpC" value="37.0"/></td>
-              <td><input name="NpD" value="23.0"/></td>
-              <!-- Current -->
-              <td> </td>
-              <td><input name="NcA" value="21.0"/></td>
-              <td><input name="NcB" value="28.0"/></td>
-              <td><input name="NcC" value="32.0"/></td>
-              <td><input name="NcD" value="19.0"/></td>
-            </tr>
-            <tr>
-              <th>Herbicides</th>
-              <!-- Previous -->
-              <td><input name="HpA" value="28.0"/></td>
-              <td><input name="HpB" value="50.0"/></td>
-              <td><input name="HpC" value="16.0"/></td>
-              <td><input name="HpD" value="6.0"/></td>
-              <!-- Current -->
-              <td> </td>
-              <td><input name="HcA" value="23.0"/></td>
-              <td><input name="HcB" value="53.0"/></td>
-              <td><input name="HcC" value="20.0"/></td>
-              <td><input name="HcD" value="4.0"/></td>
-            </tr>
-            <tr>
-              <th>Soil</th>
-              <!-- Previous -->
-              <td><input name="SpA" value="30.0"/></td>
-              <td><input name="SpB" value="40.0"/></td>
-              <td><input name="SpC" value="19.0"/></td>
-              <td><input name="SpD" value="11.0"/></td>
-              <!-- Current -->
-              <td> </td>
-              <td><input name="ScA" value="27.0"/></td>
-              <td><input name="ScB" value="35.0"/></td>
-              <td><input name="ScC" value="29.0"/></td>
-              <td><input name="ScD" value="9.0"/></td>
-            </tr>
-          </tbody>
-        </table>
-        <button type="submit">Render</button>
-        <hr/>
-        <img src="land-practice-chart"/>
+        <div class="row">
+          <div class="span6">
+            <div class="control-group">
+              <label class="control-label" for="title">Title</label>
+              <div class="controls">
+                <input class="span3" type="text" name="title"
+                  value="Sugarcane Practices Chart"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">
+                <h5>Previous Report</h5>
+              </label>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="pLabel">Label</label>
+              <div class="controls">
+                <input class="span3" type="text" name="pLabel"
+                  value="2008-2009"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <table>
+                <thead>
+                  <tr>
+                    <th> </th>
+                    <th>A</th><th>B</th><th>C</th><th>D</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="total-100">
+                    <th><label class="control-label">Nutrients</label></th>
+                    <!-- Previous -->
+                    <td><input class="span1" type="text" name="NpA" value="21.0"></td>
+                    <td><input class="span1" type="text" name="NpB" value="19.0"/></td>
+                    <td><input class="span1" type="text" name="NpC" value="37.0"/></td>
+                    <td><input class="span1" type="text" name="NpD" value="23.0"/></td>
+                  </tr>
+                  <tr class="total-100">
+                    <th><label class="control-label">Herbicides</label></th>
+                    <!-- Previous -->
+                    <td><input class="span1" type="text" name="HpA" value="28.0"/></td>
+                    <td><input class="span1" type="text" name="HpB" value="50.0"/></td>
+                    <td><input class="span1" type="text" name="HpC" value="16.0"/></td>
+                    <td><input class="span1" type="text" name="HpD" value="6.0"/></td>
+                  </tr>
+                  <tr class="total-100">
+                    <th><label class="control-label">Soil</label></th>
+                    <!-- Previous -->
+                    <td><input class="span1" type="text" name="SpA" value="30.0"/></td>
+                    <td><input class="span1" type="text" name="SpB" value="40.0"/></td>
+                    <td><input class="span1" type="text" name="SpC" value="19.0"/></td>
+                    <td><input class="span1" type="text" name="SpD" value="11.0"/></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="control-group">
+              <label class="control-label">
+                <h5>Current Report</h5>
+              </label>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="cLabel">Label</label>
+              <div class="controls">
+                <input class="span3" type="text" name="cLabel"
+                  value="2009-2010"/>
+              </div>
+            </div>
+            <div class="control-group">
+              <table>
+                <thead>
+                  <tr>
+                    <th> </th>
+                    <th>A</th><th>B</th><th>C</th><th>D</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="total-100">
+                    <th><label class="control-label">Nutrients</label></th>
+                    <!-- Current -->
+                    <td><input class="span1" type="text" name="NcA" value="21.0"/></td>
+                    <td><input class="span1" type="text" name="NcB" value="28.0"/></td>
+                    <td><input class="span1" type="text" name="NcC" value="32.0"/></td>
+                    <td><input class="span1" type="text" name="NcD" value="19.0"/></td>
+                  </tr>
+                  <tr class="total-100">
+                    <th><label class="control-label">Herbicides</label></th>
+                    <!-- Current -->
+                    <td><input class="span1" type="text" name="HcA" value="23.0"/></td>
+                    <td><input class="span1" type="text" name="HcB" value="53.0"/></td>
+                    <td><input class="span1" type="text" name="HcC" value="20.0"/></td>
+                    <td><input class="span1" type="text" name="HcD" value="4.0"/></td>
+                  </tr>
+                  <tr class="total-100">
+                    <th><label class="control-label">Soil</label></th>
+                    <!-- Current -->
+                    <td><input class="span1" type="text" name="ScA" value="27.0"/></td>
+                    <td><input class="span1" type="text" name="ScB" value="35.0"/></td>
+                    <td><input class="span1" type="text" name="ScC" value="29.0"/></td>
+                    <td><input class="span1" type="text" name="ScD" value="9.0"/></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="span6">
+            <img src="land-practice-chart"/>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button class="btn" type="submit">Render</button>
+          </div>
+        </div>
       </fieldset>
     </form>
     <script type="text/javascript">
@@ -119,7 +212,19 @@
       return false;
     });
     $('button[type="submit"]').click();
+    $('.total-100').on('change', 'input', function(event) {
+      var $inputs = $(event.delegateTarget).find('input');
+      var index = $inputs.index(this);
+      var values = _.map($inputs, function(v) {
+        return parseFloat($(v).val());
+      });
+      // Always alter next field to balance, except when the last cell
+      var alterIndex = $inputs.size() - 1 == index ? index - 1 : index + 1;
+      var total = _.reduce(values, function(m,n) { return m + n; }, 0);
+      $($inputs.get(alterIndex)).val(values[alterIndex] + (100 - total));
+    });
     </script>
-    <footer>Running on {{#runtime}}{{name}} {{version}}{{/runtime}}</footer>
+    <!-- Running on {{#runtime}}{{name}} {{version}} {{/runtime}}-->
+    </div>
   </body>
 </html>
