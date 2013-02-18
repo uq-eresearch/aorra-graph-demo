@@ -55,7 +55,6 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     val content = new ChartContentWrapper(chart)
     contentType = content.getContentType
     transformToBytes(content)
-
   }
 
   get("/progress-chart") {

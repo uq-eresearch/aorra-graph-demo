@@ -80,7 +80,10 @@
         </div>
         <div class="control-group">
           <div class="controls">
-            <button class="btn" type="submit">Render</button>
+            <button class="btn" type="submit">
+              <i class="icon-bar-chart"> </i>
+              Render
+            </button>
           </div>
         </div>
       </fieldset>
@@ -103,7 +106,9 @@
               </label>
             </div>
             <div class="control-group">
-              <label class="control-label" for="pLabel">Label</label>
+              <label class="control-label" for="pLabel">
+                <i title="Label" class="icon-tag"> </i>
+              </label>
               <div class="controls">
                 <input class="span3" type="text" name="pLabel"
                   value="2008-2009"/>
@@ -151,7 +156,9 @@
               </label>
             </div>
             <div class="control-group">
-              <label class="control-label" for="cLabel">Label</label>
+              <label class="control-label" for="cLabel">
+                <i title="Label" class="icon-tag"> </i>
+              </label>
               <div class="controls">
                 <input class="span3" type="text" name="cLabel"
                   value="2009-2010"/>
@@ -200,7 +207,10 @@
         </div>
         <div class="control-group">
           <div class="controls">
-            <button class="btn" type="submit">Render</button>
+            <button class="btn" type="submit">
+              <i class="icon-bar-chart"> </i>
+              Render
+            </button>
           </div>
         </div>
       </fieldset>
@@ -208,7 +218,10 @@
     <script type="text/javascript">
     $('form').submit(function() {
       var serialize = $(this).serialize();
-      $(this).find('img').attr('src', $(this).attr('id')+'?'+serialize);
+      var $img = $(this).find('img');
+      $img.on('load error', function() { $img.fadeIn(200); })
+      $img.fadeOut(200);
+      $img.attr('src', $(this).attr('id')+'?'+serialize);
       return false;
     });
     $('button[type="submit"]').click();
