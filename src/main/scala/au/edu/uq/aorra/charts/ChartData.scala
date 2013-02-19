@@ -2,6 +2,7 @@ package au.edu.uq.aorra.charts
 
 object ChartData {
 
+  type GrazingPracticeDataKey = (Group.Value, Rating.Value)
   type LandPracticeDataKey = (Reading.Value, Group.Value, Rating.Value)
 
   object Rating extends Enumeration {

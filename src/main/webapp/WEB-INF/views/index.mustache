@@ -8,7 +8,7 @@
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
     <style type="text/css">
-    #land-practice-chart td input {
+    .total-100 td input {
       text-align: right;
 
     }
@@ -69,7 +69,7 @@
               <label class="control-label" for="width">Dimensions</label>
               <div class="controls">
                 <div class="input-append">
-                  <input class="span1 text-right" type="text" name="width"/>
+                  <input class="span1 text-r21.0ight" type="text" name="width"/>
                   <span class="add-on">px</span>
                 </div>
                 &times;
@@ -99,84 +99,79 @@
         <legend>Grazing Practice Chart</legend>
         <div class="row">
           <div class="span6">
-            <div class="control-group total-100">
+            <div class="control-group">
+              <label class="control-label" for="title">Title</label>
+              <div class="controls">
+                <input class="span3" type="text" name="title"
+                  value="Grazing practices"/>
+              </div>
+            </div>
+            <div class="control-group">
               <label class="control-label">
                 <strong>Previous Report</strong>
               </label>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="pLabel">
+                <i title="Label" class="icon-tag"> </i>
+              </label>
               <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">A</span>
-                  <input class="span1 text-right"
-                    type="text" name="pA" value="10"/>
-                  <span class="add-on">%</span>
-                </div>
-              </div>
-              <br/>
-              <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">B</span>
-                  <input class="span1 text-right"
-                    type="text" name="pB" value="20"/>
-                  <span class="add-on">%</span>
-                </div>
-              </div>
-              <br/>
-              <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">C</span>
-                  <input class="span1 text-right"
-                    type="text" name="pC" value="30"/>
-                  <span class="add-on">%</span>
-                </div>
-              </div>
-              <br/>
-              <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">D</span>
-                  <input class="span1 text-right"
-                    type="text" name="pD" value="40"/>
-                  <span class="add-on">%</span>
-                </div>
+                <input class="span3" type="text" name="pLabel"
+                  value="2008-2009"/>
               </div>
             </div>
-            <div class="control-group total-100">
+            <div class="control-group">
+              <div class="controls">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>A</th><th>B</th><th>C</th><th>D</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="total-100">
+                      <!-- Previous -->
+                      <td><input class="span1" type="text" name="pA" value="21.0"></td>
+                      <td><input class="span1" type="text" name="pB" value="19.0"/></td>
+                      <td><input class="span1" type="text" name="pC" value="37.0"/></td>
+                      <td><input class="span1" type="text" name="pD" value="23.0"/></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="control-group">
               <label class="control-label">
                 <strong>Current Report</strong>
               </label>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="cLabel">
+                <i title="Label" class="icon-tag"> </i>
+              </label>
               <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">A</span>
-                  <input class="span1 text-right"
-                    type="text" name="cA" value="20"/>
-                  <span class="add-on">%</span>
-                </div>
+                <input class="span3" type="text" name="cLabel"
+                  value="2009-2010"/>
               </div>
-              <br/>
+            </div>
+            <div class="control-group">
               <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">B</span>
-                  <input class="span1 text-right"
-                    type="text" name="cB" value="30"/>
-                  <span class="add-on">%</span>
-                </div>
-              </div>
-              <br/>
-              <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">C</span>
-                  <input class="span1 text-right"
-                    type="text" name="cC" value="40"/>
-                  <span class="add-on">%</span>
-                </div>
-              </div>
-              <br/>
-              <div class="controls">
-                <div class="input-prepend input-append">
-                  <span class="add-on">D</span>
-                  <input class="span1 text-right"
-                    type="text" name="cD" value="50"/>
-                  <span class="add-on">%</span>
-                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>A</th><th>B</th><th>C</th><th>D</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="total-100">
+                      <!-- Previous -->
+                      <td><input class="span1" type="text" name="cA" value="21.0"></td>
+                      <td><input class="span1" type="text" name="cB" value="28.0"/></td>
+                      <td><input class="span1" type="text" name="cC" value="32.0"/></td>
+                      <td><input class="span1" type="text" name="cD" value="19.0"/></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
             <div class="control-group">

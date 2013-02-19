@@ -11,6 +11,7 @@ import ereefs.charts.Configuration.COLOR_C_TRANS
 import ereefs.charts.Configuration.COLOR_D
 import ereefs.charts.Configuration.COLOR_D_TRANS
 import ereefs.charts.Configuration.LEGEND_FONT
+import ereefs.charts.Configuration.TITLE_FONT
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Shape
@@ -37,10 +38,100 @@ import org.jfree.ui.RectangleInsets
 import com.google.common.collect.ImmutableList
 import ChartData._
 import org.jfree.data.category.DefaultCategoryDataset
+import java.awt.geom.Rectangle2D
+import java.awt.Graphics2D
+import org.jfree.chart.axis.ValueAxis
+import org.jfree.chart.renderer.category.CategoryItemRendererState
+import ereefs.charts.GraphUtils
+import java.awt.geom.AffineTransform
+import org.jfree.chart.title.TextTitle
 
-class LandPracticeChart(val renderer: GroupedStackedBarRenderer) {
+class LandPracticeChart(val periodLabels: (String,String)) {
 
   type DataKey = ChartData.LandPracticeDataKey
+
+  private val renderer = new BarLegendRenderer(periodLabels)
+
+  class BarLegendRenderer(val periodLabels: (String, String))
+    extends GroupedStackedBarRenderer {
+
+    private def legend = Map[(Int, Int), String](
+      (3, 0) -> s"Nutrients ${periodLabels._1}",
+      (7, 0) -> s"Nutrients ${periodLabels._2}",
+      (3, 1) -> s"Herbicides ${periodLabels._1}",
+      (7, 1) -> s"Herbicides ${periodLabels._2}",
+      (3, 2) -> s"Soil ${periodLabels._1}",
+      (7, 2) -> s"Soil ${periodLabels._2}")
+
+    override def drawItem(
+      g2: Graphics2D,
+      state: CategoryItemRendererState,
+      dataArea: Rectangle2D,
+      plot: CategoryPlot,
+      domainAxis: CategoryAxis,
+      rangeAxis: ValueAxis,
+      dataset: CategoryDataset,
+      row: Int, column: Int, pass: Int) = {
+      super.drawItem(g2, state, dataArea, plot, domainAxis, rangeAxis, dataset,
+        row, column, pass)
+      if (pass == 2) {
+        afterDrawItem(g2, state, dataArea, plot, domainAxis, row, column)
+        if (row == 7) redrawBlackLines(g2, dataArea)
+      }
+    }
+
+    def afterDrawItem(
+      g2: Graphics2D,
+      state: CategoryItemRendererState,
+      dataArea: Rectangle2D,
+      plot: CategoryPlot,
+      domainAxis: CategoryAxis,
+      row: Int, column: Int) {
+      // after the stacked bar is completely rendered draw the glow text into it
+      val label = legend.get((row, column)) getOrElse (return )
+      val barW0 = calculateBarW0(plot, plot.getOrientation(), dataArea,
+        domainAxis, state, row, column)
+      val labelx = barW0 + state.getBarWidth() / 2
+      // TODO: does not seem to be correct, but ok for now
+      val labely = dataArea.getMinY() + dataArea.getHeight() * .10
+      val angle = GraphUtils.toRadians(-90)
+      g2.setFont(LEGEND_FONT)
+      g2.setColor(Color.WHITE)
+      val g = new GraphUtils(g2)
+      val img = g.drawGlowString(
+        label, LEGEND_FONT, Color.black, Color.white, 6)
+      val saveT = g2.getTransform()
+      val transform = new AffineTransform()
+      // jfree chart seem to be using the transform on the Graphics2D object
+      // for scaling when the window gets very small or large
+      // therefore we can not just overwrite the transform but have to factor it
+      // into our rotation and translation transformations.
+      transform.concatenate(saveT)
+      transform.concatenate(
+          AffineTransform.getRotateInstance(angle, labelx, labely))
+      // first translate to the center right
+      transform.concatenate(AffineTransform.getTranslateInstance(
+        -img.getWidth(), -img.getHeight() / 2))
+      g2.setTransform(transform)
+      g2.drawImage(img, null, labelx.toInt, labely.toInt)
+      g2.setTransform(saveT)
+    }
+
+    /**
+     * Workaround: because the dataArea sits on the the Axis the 0% gridline
+     * gets drawn over the category axis making it gray. To fix this as we
+     * draw another black line to restore the black axis.
+     */
+    def redrawBlackLines(g2: Graphics2D, da: Rectangle2D) {
+      g2.setColor(Color.black)
+      g2.setStroke(new BasicStroke(2))
+      val Seq(x0, x1, y0, y1) =
+        Seq(da.getMinX, da.getMaxX, da.getMinY, da.getMaxY) map { _.toInt }
+      g2.drawLine(x0, y1, x1, y1)
+      g2.drawLine(x0, y0, x0, y1)
+    }
+
+  }
 
   def createLegend() = {
     val legendItems = new LegendItemCollection
@@ -60,7 +151,7 @@ class LandPracticeChart(val renderer: GroupedStackedBarRenderer) {
     legend
   }
 
-  def createChart(data: Map[DataKey, Double]) = {
+  def createChart(titleText: String, data: Map[DataKey, Double]) = {
     val dataset = createDataset(data)
     val chart = ChartFactory.createStackedBarChart(
       "", // chart title
@@ -72,6 +163,7 @@ class LandPracticeChart(val renderer: GroupedStackedBarRenderer) {
       true, // tooltips
       false // urls
       )
+    chart.addSubtitle(new TextTitle(titleText, TITLE_FONT))
     chart.addLegend(createLegend)
     val plot = chart.getPlot.asInstanceOf[CategoryPlot]
     plot.setBackgroundPaint(Color.white)

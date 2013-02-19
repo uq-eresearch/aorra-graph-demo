@@ -7,16 +7,15 @@ import java.awt.Dimension
 import java.io.ByteArrayOutputStream
 import org.jfree.data.category.CategoryDataset
 import org.jfree.chart.title.TextTitle
-import au.edu.uq.aorra.charts._
-import ereefs.charts.Configuration.TITLE_FONT
 import ereefs.content.Content
+import au.edu.uq.aorra.charts.{
+  ChartData, GrazingPracticeChart, LandPracticeChart}
 import ereefs.charts.{
   CategoryDatasetBuilder, ChartContentWrapper, ChartRenderer,
   DimensionsWrapper, ProgressChart, ProgressChartBuilder}
 import ereefs.images._
 import java.util.NoSuchElementException
 import ereefs.charts.BeerCoaster
-import ereefs.charts.GrazingPracticesChart
 import org.jfree.data.category.DefaultCategoryDataset
 
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
@@ -32,28 +31,11 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
   get("/grazing-practice-chart") {
     import ChartData._
 
-    val paramMap = grazingParamMap
-    val data = multiParams.keys
-        .filter(k => paramMap.contains(k))
-        .map({ k =>
-          val v1 = paramMap.get(k).get
-          val v2 = multiParams.get(k) match {
-            case Some(Seq(x, _*)) => x.toDouble
-          }
-          (v1, v2)
-        }).toMap
+    val data = mapParamsToData(grazingParamMap)
 
-    val dataset = new DefaultCategoryDataset()
-    data.toSeq.sortBy({ _._1._2 }).foreach({ p =>
-      val ((group, rating), value) = p
-      val series = group match {
-        case Group.Previous => "2008-2009"
-        case Group.Current => "2009-2010"
-      }
-      dataset.addValue(value, series, rating.toString)
-    })
-
-    val chart = GrazingPracticesChart.createChart(dataset)
+    val chart = (new GrazingPracticeChart(
+        (paramOrBlank("pLabel"),paramOrBlank("cLabel")))).createChart(
+            paramOrBlank("title"), data)
     val dimension = new Dimension(500, 500)
     val wrapper = new DimensionsWrapper(chart, dimension)
 
@@ -82,39 +64,20 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
   }
 
   get("/land-practice-chart") {
-    val paramMap = landParamMap()
+    val chart = (new LandPracticeChart(
+        (paramOrBlank("pLabel"),paramOrBlank("cLabel")))).createChart(
+                paramOrBlank("title"), mapParamsToData(landParamMap))
+    val wrapper = new DimensionsWrapper(chart, new Dimension(500, 500))
 
-    val data = multiParams.keys
-        .filter(k => paramMap.contains(k))
-        .map({ k =>
-          val v1 = paramMap.get(k).get
-          val v2 = multiParams.get(k) match {
-            case Some(Seq(x, _*)) => x.toDouble
-          }
-          (v1, v2)
-        }).toMap
-
-    def paramOrBlank(k: String) = try {
-      params(k)
-    } catch {
-      case _: NoSuchElementException => ""
-    }
-
-    val chart = createLandPracticeChart(
-        new Dimension(500, 500),
-        data,
-        paramOrBlank("title"),
-        (paramOrBlank("pLabel"),paramOrBlank("cLabel")))
-
-    val content = new ChartContentWrapper(chart)
+    val content = new ChartContentWrapper(wrapper)
     contentType = content.getContentType
     transformToBytes(content)
   }
 
   get("/progress-chart") {
     val builder = new ProgressChartBuilder(
-        multiParams("tl").headOption getOrElse "",
-        multiParams("tr").headOption getOrElse "",
+        paramOrBlank("tl"),
+        paramOrBlank("tr"),
         multiParams("max").headOption map { _.toInt} getOrElse 100)
     val chart = builder.get(multiParams("value").headOption match {
       case Some(v) => v.toFloat
@@ -130,6 +93,12 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     transformToBytes(content)
   }
 
+  private def paramOrBlank(k: String) = try {
+    params(k)
+  } catch {
+    case _: NoSuchElementException => ""
+  }
+
   private def conditionOption(name: String) = {
     multiParams(name.toLowerCase) match {
       case Seq() => None
@@ -139,6 +108,18 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
         case _: IllegalArgumentException => None
       }
     }
+  }
+
+  private def mapParamsToData[A](paramMap: Map[String, A]): Map[A, Double] = {
+    multiParams.keys
+      .filter(k => paramMap.contains(k))
+      .map({ k =>
+        val v1 = paramMap.get(k).get
+        val v2 = multiParams.get(k) match {
+          case Some(Seq(x, _*)) => x.toDouble
+        }
+        (v1, v2)
+      }).toMap
   }
 
   private def grazingParamMap() = {
@@ -175,19 +156,6 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
       yield (""+re._1+g._1+r8._1, (re._2, g._2, r8._2))
     // Output as map
     ptups.toMap
-  }
-
-  private def createLandPracticeChart(
-       dimension: Dimension,
-       data: Map[ChartData.LandPracticeDataKey, Double],
-       title: String,
-       periodLabels: (String, String)) = {
-    val renderer = new au.edu.uq.aorra.charts.BarLegendRenderer(periodLabels)
-    val chart = new LandPracticeChart(renderer)
-    val result = chart.createChart(data);
-    result.addSubtitle(new TextTitle(title, TITLE_FONT))
-    val wrapper = new DimensionsWrapper(result, dimension)
-    wrapper
   }
 
   private def chartImageContent(renderer: ChartRenderer) = {
