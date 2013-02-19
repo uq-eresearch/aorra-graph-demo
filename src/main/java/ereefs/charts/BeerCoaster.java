@@ -25,7 +25,7 @@ public class BeerCoaster implements Dimensions {
     private static final Color NOT_EVALUATED = new Color(229,229,229);
 
     public static enum Condition {
-        
+
         VERY_GOOD("Very good", new Color(0,118,70)),
         GOOD("Good", new Color(168,198,162)),
         MODERATE("Moderate", new Color(252,203,38)),
@@ -55,8 +55,7 @@ public class BeerCoaster implements Dimensions {
     }
 
     public static enum Indicator {
-        
-        CHLOROPHYLL_A("Chlorophyll a", 90, -60, Rotation.CLOCKWISE, 30),
+        CHLOROPHYLL_A("Chlorophyll α", 90, -60, Rotation.CLOCKWISE, 30),
         TOTAL_SUSPENDED_SOLIDS("Total suspended solids", 30, -60, Rotation.COUNTER_CLOCKWISE, 90),
         SETTLEMENT("Change", -30, -30, Rotation.COUNTER_CLOCKWISE, 135),
         JUVENILE("Juvenile", -60, -30, Rotation.COUNTER_CLOCKWISE, 165),
@@ -166,7 +165,7 @@ public class BeerCoaster implements Dimensions {
     private static final Font INDICATOR_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
     private static final Font LEGEND_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
     private static final Font NOT_EVALUATED_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 17);
-    // The legend will be placed at the LEGEND_ANGLE measured from the center of the beer coaster 
+    // The legend will be placed at the LEGEND_ANGLE measured from the center of the beer coaster
     private static final int LEGEND_ANGLE = 79;
 
 //    private int width;
@@ -305,7 +304,7 @@ public class BeerCoaster implements Dimensions {
             }
             y += fm.getHeight();
         }
-        
+
     }
 
     private void drawMarineCondition() {
@@ -340,7 +339,7 @@ public class BeerCoaster implements Dimensions {
             g = new GraphUtils(g2d);
             g2d.setColor(Color.WHITE);
             g2d.fillRect(0, 0, dimension.width, dimension.height);
-            
+
             g2d.setFont(CATEGORY_FONT);
             FontMetrics fm = g.getGraphics().getFontMetrics();
 //            int radius = Math.min(dimension.width, dimension.height)/2;
@@ -349,7 +348,7 @@ public class BeerCoaster implements Dimensions {
             this.bcr = radius - fm.getHeight();
             this.bcx = radius;
             this.bcy = radius;
-            
+
             for(Indicator indicator : Indicator.values()) {
                 drawIndicator(indicator);
             }

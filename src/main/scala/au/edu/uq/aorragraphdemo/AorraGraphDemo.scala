@@ -15,6 +15,7 @@ import ereefs.charts.{
   DimensionsWrapper, ProgressChart, ProgressChartBuilder}
 import ereefs.images._
 import java.util.NoSuchElementException
+import ereefs.charts.BeerCoaster
 
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
@@ -24,6 +25,51 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
         "version" -> System.getProperty("java.runtime.version"))
     contentType = "text/html"
     mustache("/index", "runtime" -> runtime)
+  }
+
+  get("/indicator-chart") {
+    val categories = BeerCoaster.Category.values map { _.toString.toLowerCase }
+    val indicators = BeerCoaster.Indicator.values map { _.toString.toLowerCase }
+
+    val chart = new BeerCoaster()
+
+    categories.foreach({ x =>
+      multiParams(x) match {
+        case Seq() => // Do nothing
+        case Seq(c, _*) => try {
+          val category = BeerCoaster.Category.valueOf(x.toUpperCase)
+          val condition = BeerCoaster.Condition.valueOf(c)
+          chart.setCondition(category, condition)
+        } catch {
+          case _: IllegalArgumentException => // Skip
+        }
+      }
+    })
+    indicators.foreach({ x =>
+      multiParams(x) match {
+        case Seq() => // Do nothing
+        case Seq(c, _*) => try {
+          val indicator = BeerCoaster.Indicator.valueOf(x.toUpperCase)
+          val condition = BeerCoaster.Condition.valueOf(c)
+          chart.setCondition(indicator, condition)
+        } catch {
+          case _: IllegalArgumentException => // Skip
+        }
+      }
+    })
+    multiParams("overall") match {
+      case Seq() => // Do nothing
+      case Seq(c, _*) => try {
+        val condition = BeerCoaster.Condition.valueOf(c)
+        chart.setOverallCondition(condition)
+      } catch {
+        case _: IllegalArgumentException => // Skip
+      }
+    }
+
+    val content = new ChartContentWrapper(chart)
+    contentType = content.getContentType
+    transformToBytes(content)
   }
 
   get("/land-practice-chart") {
