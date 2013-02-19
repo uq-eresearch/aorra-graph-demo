@@ -16,6 +16,8 @@ import ereefs.charts.{
 import ereefs.images._
 import java.util.NoSuchElementException
 import ereefs.charts.BeerCoaster
+import ereefs.charts.GrazingPracticesChart
+import org.jfree.data.category.DefaultCategoryDataset
 
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
@@ -25,6 +27,39 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
         "version" -> System.getProperty("java.runtime.version"))
     contentType = "text/html"
     mustache("/index", "runtime" -> runtime)
+  }
+
+  get("/grazing-practice-chart") {
+    import ChartData._
+
+    val paramMap = grazingParamMap
+    val data = multiParams.keys
+        .filter(k => paramMap.contains(k))
+        .map({ k =>
+          val v1 = paramMap.get(k).get
+          val v2 = multiParams.get(k) match {
+            case Some(Seq(x, _*)) => x.toDouble
+          }
+          (v1, v2)
+        }).toMap
+
+    val dataset = new DefaultCategoryDataset()
+    data.toSeq.sortBy({ _._1._2 }).foreach({ p =>
+      val ((group, rating), value) = p
+      val series = group match {
+        case Group.Previous => "2008-2009"
+        case Group.Current => "2009-2010"
+      }
+      dataset.addValue(value, series, rating.toString)
+    })
+
+    val chart = GrazingPracticesChart.createChart(dataset)
+    val dimension = new Dimension(500, 500)
+    val wrapper = new DimensionsWrapper(chart, dimension)
+
+    val content = new ChartContentWrapper(wrapper)
+    contentType = content.getContentType
+    transformToBytes(content)
   }
 
   get("/indicator-chart") {
@@ -104,6 +139,22 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
         case _: IllegalArgumentException => None
       }
     }
+  }
+
+  private def grazingParamMap() = {
+    import ChartData._
+    val mappings = (
+      Seq(
+        'p' -> Group.Previous,
+        'c' -> Group.Current),
+      Rating.values.map(r => (s"$r".charAt(0), r))
+    )
+    // Should build an param => key sequence. eg.
+    //   Seq(("pA", (Group.Previous, Rating.A)), ...)
+    val ptups = for (g <- mappings._1; r8 <- mappings._2)
+      yield (""+g._1+r8._1, (g._2, r8._2))
+    // Output as map
+    ptups.toMap
   }
 
   private def landParamMap() = {
