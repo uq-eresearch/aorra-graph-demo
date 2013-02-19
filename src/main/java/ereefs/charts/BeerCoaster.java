@@ -55,7 +55,7 @@ public class BeerCoaster implements Dimensions {
     }
 
     public static enum Indicator {
-        CHLOROPHYLL_A("Chlorophyll α", 90, -60, Rotation.CLOCKWISE, 30),
+        CHLOROPHYLL_A("Chlorophyll \u03b1", 90, -60, Rotation.CLOCKWISE, 30),
         TOTAL_SUSPENDED_SOLIDS("Total suspended solids", 30, -60, Rotation.COUNTER_CLOCKWISE, 90),
         SETTLEMENT("Change", -30, -30, Rotation.COUNTER_CLOCKWISE, 135),
         JUVENILE("Juvenile", -60, -30, Rotation.COUNTER_CLOCKWISE, 165),
