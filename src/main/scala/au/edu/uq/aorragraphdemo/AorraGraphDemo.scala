@@ -28,44 +28,18 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
   }
 
   get("/indicator-chart") {
-    val categories = BeerCoaster.Category.values map { _.toString.toLowerCase }
-    val indicators = BeerCoaster.Indicator.values map { _.toString.toLowerCase }
-
     val chart = new BeerCoaster()
-
-    categories.foreach({ x =>
-      multiParams(x) match {
-        case Seq() => // Do nothing
-        case Seq(c, _*) => try {
-          val category = BeerCoaster.Category.valueOf(x.toUpperCase)
-          val condition = BeerCoaster.Condition.valueOf(c)
-          chart.setCondition(category, condition)
-        } catch {
-          case _: IllegalArgumentException => // Skip
-        }
+    BeerCoaster.Category.values.foreach({ category =>
+      conditionOption(category.toString) map {
+        chart.setCondition(category, _)
       }
     })
-    indicators.foreach({ x =>
-      multiParams(x) match {
-        case Seq() => // Do nothing
-        case Seq(c, _*) => try {
-          val indicator = BeerCoaster.Indicator.valueOf(x.toUpperCase)
-          val condition = BeerCoaster.Condition.valueOf(c)
-          chart.setCondition(indicator, condition)
-        } catch {
-          case _: IllegalArgumentException => // Skip
-        }
+    BeerCoaster.Indicator.values.foreach({ indicator =>
+      conditionOption(indicator.toString) map {
+        chart.setCondition(indicator, _)
       }
     })
-    multiParams("overall") match {
-      case Seq() => // Do nothing
-      case Seq(c, _*) => try {
-        val condition = BeerCoaster.Condition.valueOf(c)
-        chart.setOverallCondition(condition)
-      } catch {
-        case _: IllegalArgumentException => // Skip
-      }
-    }
+    conditionOption("overall") map { chart.setOverallCondition(_) }
 
     val content = new ChartContentWrapper(chart)
     contentType = content.getContentType
@@ -84,7 +58,6 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
           }
           (v1, v2)
         }).toMap
-
 
     def paramOrBlank(k: String) = try {
       params(k)
@@ -120,6 +93,17 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     val content = chartImageContent(renderer)
     contentType = content.getContentType
     transformToBytes(content)
+  }
+
+  private def conditionOption(name: String) = {
+    multiParams(name.toLowerCase) match {
+      case Seq() => None
+      case Seq(c, _*) => try {
+        Some(BeerCoaster.Condition.valueOf(c))
+      } catch {
+        case _: IllegalArgumentException => None
+      }
+    }
   }
 
   private def landParamMap() = {
