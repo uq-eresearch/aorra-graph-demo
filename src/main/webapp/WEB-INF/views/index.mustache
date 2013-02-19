@@ -13,6 +13,12 @@
 
     }
 
+    form img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     table .control-label {
       margin-right: 18px;
     }
@@ -73,17 +79,17 @@
                 </div>
               </div>
             </div>
+            <div class="control-group">
+              <div class="controls">
+                <button class="btn" type="submit">
+                  <i class="icon-bar-chart"> </i>
+                  Render
+                </button>
+              </div>
+            </div>
           </div>
           <div class="span6">
             <img/>
-          </div>
-        </div>
-        <div class="control-group">
-          <div class="controls">
-            <button class="btn" type="submit">
-              <i class="icon-bar-chart"> </i>
-              Render
-            </button>
           </div>
         </div>
       </fieldset>
@@ -200,17 +206,17 @@
                 </tbody>
               </table>
             </div>
+            <div class="control-group">
+              <div class="controls">
+                <button class="btn" type="submit">
+                  <i class="icon-bar-chart"> </i>
+                  Render
+                </button>
+              </div>
+            </div>
           </div>
           <div class="span6">
             <img src="land-practice-chart"/>
-          </div>
-        </div>
-        <div class="control-group">
-          <div class="controls">
-            <button class="btn" type="submit">
-              <i class="icon-bar-chart"> </i>
-              Render
-            </button>
           </div>
         </div>
       </fieldset>
@@ -225,7 +231,7 @@
                 <strong>Water Quality</strong>
               </label>
               <div class="controls">
-                <select name="water_quality">
+                <select class="span3" name="water_quality">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -240,7 +246,7 @@
                 Chlorophyll &alpha;
               </label>
               <div class="controls">
-                <select name="chlorophyll_a">
+                <select class="span3" name="chlorophyll_a">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -255,7 +261,7 @@
                 Total Suspended Solids
               </label>
               <div class="controls">
-                <select name="total_suspended_solids">
+                <select class="span3" name="total_suspended_solids">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -271,7 +277,7 @@
                 <strong>Coral</strong>
               </label>
               <div class="controls">
-                <select name="coral">
+                <select class="span3" name="coral">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -286,7 +292,7 @@
                 Change
               </label>
               <div class="controls">
-                <select name="settlement">
+                <select class="span3" name="settlement">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -301,7 +307,7 @@
                 Juvenile
               </label>
               <div class="controls">
-                <select name="juvenile">
+                <select class="span3" name="juvenile">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -316,7 +322,7 @@
                 Macroalgae
               </label>
               <div class="controls">
-                <select name="algae">
+                <select class="span3" name="algae">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -331,7 +337,7 @@
                 Cover
               </label>
               <div class="controls">
-                <select name="cover">
+                <select class="span3" name="cover">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -347,7 +353,7 @@
                 <strong>Seagrass</strong>
               </label>
               <div class="controls">
-                <select name="seagrass">
+                <select class="span3" name="seagrass">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD" selected>Good</option>
@@ -362,7 +368,7 @@
                 Abundance
              </label>
               <div class="controls">
-                <select name="abundance">
+                <select class="span3" name="abundance">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD" selected>Good</option>
@@ -377,7 +383,7 @@
                 Reproduction
               </label>
               <div class="controls">
-                <select name="reproduction">
+                <select class="span3" name="reproduction">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD" selected>Very Good</option>
                   <option value="GOOD">Good</option>
@@ -392,7 +398,7 @@
                 Nutrient Status
               </label>
               <div class="controls">
-                <select name="nutrient_status">
+                <select class="span3" name="nutrient_status">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -408,7 +414,7 @@
                 <strong>Overall</strong>
               </label>
               <div class="controls">
-                <select name="overall">
+                <select class="span3" name="overall">
                   <option value="">Not Evaluated</option>
                   <option value="VERY_GOOD">Very Good</option>
                   <option value="GOOD">Good</option>
@@ -418,17 +424,17 @@
                 </select>
               </div>
             </div>
+            <div class="control-group">
+              <div class="controls">
+                <button class="btn" type="submit">
+                  <i class="icon-bar-chart"> </i>
+                  Render
+                </button>
+              </div>
+            </div>
           </div>
           <div class="span6">
             <img/>
-          </div>
-        </div>
-        <div class="control-group">
-          <div class="controls">
-            <button class="btn" type="submit">
-              <i class="icon-bar-chart"> </i>
-              Render
-            </button>
           </div>
         </div>
       </fieldset>
