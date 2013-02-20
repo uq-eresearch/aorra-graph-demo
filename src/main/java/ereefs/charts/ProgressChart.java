@@ -1,7 +1,7 @@
 package ereefs.charts;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.min;
-import static java.lang.Math.round;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -37,7 +37,8 @@ import ereefs.boxrenderer.TextBox;
 public class ProgressChart implements Dimensions {
 
     private static final Color PROGRESS_COLOR = new Color(24,62,115);
-    private static final int BAR_HEIGHT = 20;
+    private static final int BAR_LENGTH = 250;
+    private static final int BAR_HEIGHT = BAR_LENGTH*8/100;
 
     private Dimension dimension;
 
@@ -69,11 +70,14 @@ public class ProgressChart implements Dimensions {
         Font largeFont = getLargeFont();
         Font regularFont = getRegularFont();
         TableCellBox cellTL = new TableCellBox(new TextBox(topLeftLabel, largeFont));
-        cellTL.setWidth(225);
+        cellTL.setWidth(BAR_LENGTH/10*9);
+        // Push TL text up a little
         cellTL.getMargin().setBottom(3);
         TableCellBox cellTR = new TableCellBox(new TextBox(topRightLabel, regularFont));
         cellTR.setAlign(Align.CENTER);
         cellTR.setValign(VAlign.BOTTOM);
+        // Avoid TR text truncation
+        cellTR.getMargin().setRight(5);
         TableCellBox cellBL = new TableCellBox(new TextBox(bottomLeftLabel, regularFont));
         TableCellBox cellBR = new TableCellBox(new TextBox(bottomRightLabel, regularFont));
         cellBR.setAlign(Align.CENTER);
@@ -87,7 +91,7 @@ public class ProgressChart implements Dimensions {
         TableCellBox progressBarBox = new TableCellBox(new ImageRenderBox(new ImageRenderer() {
             @Override
             public Dimension getDimension(Graphics2D g2) throws Exception {
-                return new Dimension(250, BAR_HEIGHT+2);
+                return new Dimension(BAR_LENGTH, BAR_HEIGHT+2);
             }
 
             @Override
@@ -105,29 +109,29 @@ public class ProgressChart implements Dimensions {
     }
 
     private void drawBar(Graphics2D g2) {
-        int w = g2.getClipBounds().width-1;
+        int w = g2.getClipBounds().width-2;
         GraphUtils g = new GraphUtils(g2);
-        float capR = ((float)BAR_HEIGHT / 2f);
-        int lx = round(capR);
-        int ly = 0;
-        int rx = w-round(capR);
-        int ry = 0;
-        int totalLength = rx-lx + round(2 * capR);
-        int pLength = min(round((float)progress/(float)100*totalLength), totalLength);
+        float capR = (float)(BAR_HEIGHT / 2);
+        int lx = (int) ceil(capR)+1;
+        int ly = 1;
+        int rx = (int)(w-ceil(capR));
+        int ry = 1;
+        int totalLength = rx-lx + (int)ceil(2 * capR);
+        int pLength = min((int)ceil((float)progress/100*totalLength), totalLength);
         g2.setColor(Color.white);
-        g.fillArc(lx, ly+Math.round(capR), capR, 90, 180);
+        g.fillArc(lx, (int)(ly+ceil(capR)), capR, 90, 180);
         g2.fillRect(lx, ly, rx-lx, BAR_HEIGHT);
-        g.fillArc(rx, ry+Math.round(capR), capR, -90, 180);
+        g.fillArc(rx, (int)(ry+ceil(capR)), capR, -90, 180);
         g2.setColor(PROGRESS_COLOR);
         if(pLength>0) {
-            g.fillArc(lx, ly+Math.round(capR), capR, 90, 180);
+            g.fillArc(lx, (int)(ly+ceil(capR)), capR, 90, 180);
             // if the arc radius is bigger then the progress length then
             // draw a white box on part of the arc to overwrite some of the fill.
             // TODO might be an issue with transparency,
             // think about using a fill cord instead (see Arc2D)
             if(capR>pLength) {
                 g2.setColor(Color.white);
-                g2.fillRect(lx-round(capR-pLength), ly, totalLength, BAR_HEIGHT);
+                g2.fillRect((int)(lx-ceil(capR-pLength)), ly, totalLength, BAR_HEIGHT);
             }
         }
         pLength -= capR;
@@ -138,23 +142,23 @@ public class ProgressChart implements Dimensions {
         }
         pLength -=width;
         if(pLength>0) {
-            g.fillArc(rx, ry+Math.round(capR), capR, -90, 180);
+            g.fillArc(rx, (int) (ry+Math.ceil(capR)), capR, -90, 180);
             if(pLength<capR) {
                 g2.setColor(Color.white);
-                g2.fillRect(rx+pLength, ry, Math.round(capR), BAR_HEIGHT);
+                g2.fillRect(rx+pLength, ry, (int) ceil(capR), BAR_HEIGHT);
             }
         }
         g.setColor(Color.black);
         g2.drawLine(lx, ly, rx, ry);
         g2.drawLine(lx, ly+BAR_HEIGHT, rx, ry+BAR_HEIGHT);
-        g.drawArc(lx, ly+Math.round(capR), capR, 90, 180, Arc2D.OPEN);
-        g.drawArc(rx, ry+Math.round(capR), capR, -90, 180, Arc2D.OPEN);
+        g.drawArc(lx, (int)(ly+ceil(capR)), capR, 90, 180, Arc2D.OPEN);
+        g.drawArc(rx, (int)(ry+ceil(capR)), capR, -90, 180, Arc2D.OPEN);
         g2.setColor(Color.white);
 
-        g2.setFont(new Font("Arial", Font.BOLD, 12));
+        g2.setFont(getBarFont());
         if(progressLabel!=null) {
             TextUtilities.drawAlignedString(String.format("%s", progressLabel),
-                    g2, lx-round(capR/2), ly+(BAR_HEIGHT/2)+1, TextAnchor.CENTER_LEFT);
+                    g2, lx-(int)ceil(capR/2), ly+(BAR_HEIGHT/2), TextAnchor.CENTER_LEFT);
         }
     }
 
@@ -248,11 +252,15 @@ public class ProgressChart implements Dimensions {
     }
 
     protected Font getRegularFont() {
-        return new Font("Liberation Sans", Font.PLAIN, 12);
+        return new Font("Liberation Sans", Font.PLAIN, BAR_HEIGHT/5*3);
     }
 
     protected Font getLargeFont() {
-        return new Font("Liberation Sans", Font.BOLD, 16);
+        return new Font("Liberation Sans", Font.BOLD, BAR_HEIGHT/5*4);
+    }
+
+    protected Font getBarFont() {
+        return new Font("Liberation Sans", Font.BOLD, BAR_HEIGHT/10*7);
     }
 
 

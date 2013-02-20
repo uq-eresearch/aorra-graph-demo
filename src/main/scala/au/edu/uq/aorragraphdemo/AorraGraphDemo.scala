@@ -17,6 +17,10 @@ import ereefs.images._
 import java.util.NoSuchElementException
 import ereefs.charts.BeerCoaster
 import org.jfree.data.category.DefaultCategoryDataset
+import java.awt.geom.AffineTransform
+import java.awt.image.BufferedImage
+import java.awt.geom.Rectangle2D
+import java.awt.RenderingHints
 
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
@@ -83,14 +87,57 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
       case Some(v) => v.toFloat
       case None => halt(400, """Parameter "value" is required.""")
     })
-    chart.setDimension(chart.getMinDimension)
 
-    val renderer = new ChartRenderer(chart)
-    renderer.setScale(rendererScale(chart.getDimension, multiParams))
+    val transform = scalingTransform(chart.getMinDimension, requestedDimensions)
 
-    val content = chartImageContent(renderer)
+    val content = chartImageContent(renderProgressChart(chart, transform))
     contentType = content.getContentType
     transformToBytes(content)
+  }
+
+  private def renderProgressChart(
+      chart: ProgressChart,
+      transform: AffineTransform) = {
+    val d = chart.getMinDimension
+    val img0 = new BufferedImage(
+        (d.width * transform.getScaleX()).ceil.toInt,
+        (d.height * transform.getScaleY()).ceil.toInt,
+        BufferedImage.TYPE_INT_ARGB)
+    val g2 = img0.createGraphics()
+    g2.setRenderingHint(
+        RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON)
+    g2.setTransform(transform)
+    chart.draw(g2, new Rectangle2D.Double(0, 0, d.width, d.height))
+    g2.dispose
+    img0
+  }
+
+  private def scalingTransform(
+      current: Dimension,
+      requested: (Option[Int], Option[Int])) = {
+    def ratio(d: (Option[Int], Option[Int])): Double = d match {
+      case (None, None) => 1 // Identity
+      case (Some(x), None) =>
+        x.toDouble / current.getWidth
+      case (None, Some(y)) =>
+        y.toDouble / current.getHeight
+      case (Some(x), Some(y)) => // Pick the lesser
+        Math.min(ratio (d._1, None), ratio (None, d._2))
+    }
+    val r = ratio(requested)
+    AffineTransform.getScaleInstance(r, r)
+  }
+
+  private def requestedDimensions(): (Option[Int], Option[Int]) = {
+    def paramOption(k: String) = {
+      try {
+        multiParams(k).headOption map { _.toInt }
+      } catch {
+        case e: NumberFormatException => None
+      }
+    }
+    (paramOption("width"), paramOption("height"))
   }
 
   private def paramOrBlank(k: String) = try {
@@ -158,23 +205,10 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     ptups.toMap
   }
 
-  private def chartImageContent(renderer: ChartRenderer) = {
+  private def chartImageContent(image: BufferedImage) = {
     new ImageContent(new ImageRenderer {
-      def render = renderer.render
+      def render = image
     })
-  }
-
-  private def rendererScale(d: Dimension, multiParams: MultiParams) = {
-    def paramOption(k: String) = {
-      try {
-        multiParams(k).headOption map { _.toInt }
-      } catch {
-        case e: NumberFormatException => None
-      }
-    }
-    new Dimension(
-        paramOption("width") getOrElse d.getWidth.toInt,
-        paramOption("height") getOrElse d.getHeight.toInt)
   }
 
   private def transformToBytes(content: Content) = {
