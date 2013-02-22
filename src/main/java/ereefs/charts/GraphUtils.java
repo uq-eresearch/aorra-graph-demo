@@ -84,10 +84,10 @@ public class GraphUtils {
         return radians * 180 / Math.PI;
     }
 
-//  copied from http://www.java.happycodings.com/Java2D/code11.html and modified to also 
+//  copied from http://www.java.happycodings.com/Java2D/code11.html and modified to also
 //  support:
 //     - counter clockwise text rendering (in this case the text is turned upside down)
-//     - text alignment is centre    
+//     - text alignment is centre
     public void drawCircleText(String st, int x, int y, double radius, double a1,
             boolean clockwise, TextAnchor anchor)
     {
@@ -215,7 +215,7 @@ public class GraphUtils {
         GlyphVector gv = font.createGlyphVector(frc, label);
         Rectangle2D bounds = gv.getVisualBounds();
         BufferedImage img = new BufferedImage(
-                (int)(bounds.getWidth()+glowRadius+1), fm.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                (int)(bounds.getWidth()+glowRadius+5), fm.getHeight(), BufferedImage.TYPE_INT_ARGB);
         drawGlowString(label, font, glowColor, fontColor, glowRadius, img, (int)glowRadius/2, fm.getAscent());
         return img;
     }

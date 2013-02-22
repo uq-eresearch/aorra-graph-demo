@@ -45,6 +45,7 @@ import org.jfree.chart.renderer.category.CategoryItemRendererState
 import ereefs.charts.GraphUtils
 import java.awt.geom.AffineTransform
 import org.jfree.chart.title.TextTitle
+import java.awt.image.AffineTransformOp
 
 class LandPracticeChart(val periodLabels: (String,String)) {
 
@@ -113,7 +114,9 @@ class LandPracticeChart(val periodLabels: (String,String)) {
       transform.concatenate(AffineTransform.getTranslateInstance(
         -img.getWidth(), -img.getHeight() / 2))
       g2.setTransform(transform)
-      g2.drawImage(img, null, labelx.toInt, labely.toInt)
+      val noopTransform = new AffineTransformOp(new AffineTransform(),
+          AffineTransformOp.TYPE_BILINEAR)
+      g2.drawImage(img, noopTransform, labelx.toInt, labely.toInt)
       g2.setTransform(saveT)
     }
 

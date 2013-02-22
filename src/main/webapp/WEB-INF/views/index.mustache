@@ -11,13 +11,21 @@
     <style type="text/css">
     .total-100 td input {
       text-align: right;
-
     }
 
     form img {
       display: block;
       margin-left: auto;
       margin-right: auto;
+    }
+
+    form div.svg svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    form .thumbnail img {
+      display: inline;
     }
 
     table .control-label {
@@ -90,7 +98,24 @@
             </div>
           </div>
           <div class="span6">
-            <img/>
+            <ul class="thumbnails">
+              <li>
+                <div class="thumbnail">
+                  <div class="svg"> </div>
+                  <div class="caption text-center">
+                    <p>As vector image (SVG)</p>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <div class="thumbnail ">
+                  <img class="png"/>
+                  <div class="caption text-center">
+                    <p>As rastered image (PNG)</p>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
         </div>
       </fieldset>
@@ -185,7 +210,7 @@
             </div>
           </div>
           <div class="span6">
-            <img/>
+            <img class="default"/>
           </div>
         </div>
       </fieldset>
@@ -312,7 +337,9 @@
             </div>
           </div>
           <div class="span6">
-            <img/>
+            <div>
+              <div class="svg"> </div>
+            </div>
           </div>
         </div>
       </fieldset>
@@ -530,7 +557,7 @@
             </div>
           </div>
           <div class="span6">
-            <img/>
+            <img class="default"/>
           </div>
         </div>
       </fieldset>
@@ -538,10 +565,13 @@
     <script type="text/javascript">
     $('form').submit(function() {
       var serialize = $(this).serialize();
-      var $img = $(this).find('img');
-      $img.on('load error', function() { $img.fadeIn(200); })
+      var $img = $(this).find('img, div.svg');
+      var fadeIn = function() { $img.fadeIn(200) };
+      $img.on('load error', fadeIn);
       $img.fadeOut(200);
-      $img.attr('src', $(this).attr('id')+'?'+serialize);
+      $img.filter('div.svg').load($(this).attr('id'), serialize, fadeIn);
+      $img.filter('img.default').attr('src', $(this).attr('id')+'?'+serialize);
+      $img.filter('img.png').attr('src', $(this).attr('id')+'.png?'+serialize);
       return false;
     });
     $('button[type="submit"]').click();

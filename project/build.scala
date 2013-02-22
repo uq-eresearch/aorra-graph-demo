@@ -12,6 +12,7 @@ object AorraGraphDemoBuild extends Build {
   val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.10.0"
   val ScalatraVersion = "2.2.0"
+  val BatikVersion = "1.6-1"
 
   lazy val project = Project (
     "aorra-graph-demo",
@@ -33,7 +34,9 @@ object AorraGraphDemoBuild extends Build {
         "commons-io" % "commons-io" % "2.3",
         "org.jfree" % "jfreechart" % "1.0.14",
         "org.apache.commons" % "commons-lang3" % "3.1",
-        "com.google.guava" % "guava" % "12.0"
+        "com.google.guava" % "guava" % "12.0",
+        "batik" % "batik-rasterizer" % BatikVersion,
+        "batik" % "batik-svggen" % BatikVersion
       ),
       scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(

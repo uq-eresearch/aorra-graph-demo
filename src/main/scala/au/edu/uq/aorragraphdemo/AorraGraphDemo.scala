@@ -9,7 +9,7 @@ import org.jfree.data.category.CategoryDataset
 import org.jfree.chart.title.TextTitle
 import ereefs.content.Content
 import au.edu.uq.aorra.charts.{
-  ChartData, GrazingPracticeChart, LandPracticeChart}
+  ChartData, GrazingPracticeChart, LandPracticeChart, SvgWrapper}
 import ereefs.charts.{
   CategoryDatasetBuilder, ChartContentWrapper, ChartRenderer,
   DimensionsWrapper, ProgressChart, ProgressChartBuilder}
@@ -21,6 +21,11 @@ import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import java.awt.geom.Rectangle2D
 import java.awt.RenderingHints
+import org.apache.batik.dom.svg.SVGDOMImplementation
+import org.apache.batik.dom.svg.SVGDOMImplementation
+import org.w3c.dom.svg.SVGDocument
+import org.apache.batik.svggen.SVGGraphics2D
+import java.io.CharArrayWriter
 
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
@@ -73,12 +78,22 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
                 paramOrBlank("title"), mapParamsToData(landParamMap))
     val wrapper = new DimensionsWrapper(chart, new Dimension(500, 500))
 
-    val content = new ChartContentWrapper(wrapper)
-    contentType = content.getContentType
-    transformToBytes(content)
+    contentType = "image/svg+xml"
+    val svg = (new au.edu.uq.aorra.charts.ChartRenderer(wrapper)).render()
+    SvgWrapper(svg).toSVG
   }
 
   get("/progress-chart") {
+    contentType = "image/svg+xml"
+    SvgWrapper(svgProgressChart).toSVG
+  }
+
+  get("/progress-chart.png") {
+    contentType = "image/png"
+    SvgWrapper(svgProgressChart).toPNG
+  }
+
+  private def svgProgressChart() = {
     val builder = new ProgressChartBuilder(
         paramOrBlank("tl"),
         paramOrBlank("tr"),
@@ -88,56 +103,31 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
       case None => halt(400, """Parameter "value" is required.""")
     })
 
-    val transform = scalingTransform(chart.getMinDimension, requestedDimensions)
-
-    val content = chartImageContent(renderProgressChart(chart, transform))
-    contentType = content.getContentType
-    transformToBytes(content)
+    renderSvgProgressChart(chart)
   }
 
-  private def renderProgressChart(
-      chart: ProgressChart,
-      transform: AffineTransform) = {
+  private def renderSvgProgressChart(
+      chart: ProgressChart) = {
+    // Get a DOMImplementation.
+    val impl = SVGDOMImplementation.getDOMImplementation()
+    val svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI
+    val doc = impl.createDocument(svgNS, "svg", null).asInstanceOf[SVGDocument]
+
+    // Create an instance of the SVG Generator.
+    val g2 = new SVGGraphics2D(doc)
+
     val d = chart.getMinDimension
-    val img0 = new BufferedImage(
-        (d.width * transform.getScaleX()).ceil.toInt,
-        (d.height * transform.getScaleY()).ceil.toInt,
-        BufferedImage.TYPE_INT_ARGB)
-    val g2 = img0.createGraphics()
     g2.setRenderingHint(
         RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON)
-    g2.setTransform(transform)
     chart.draw(g2, new Rectangle2D.Double(0, 0, d.width, d.height))
+    g2.setSVGCanvasSize(d)
+
+    val cw = new CharArrayWriter()
+    g2.stream(cw, true)
     g2.dispose
-    img0
-  }
 
-  private def scalingTransform(
-      current: Dimension,
-      requested: (Option[Int], Option[Int])) = {
-    def ratio(d: (Option[Int], Option[Int])): Double = d match {
-      case (None, None) => 1 // Identity
-      case (Some(x), None) =>
-        x.toDouble / current.getWidth
-      case (None, Some(y)) =>
-        y.toDouble / current.getHeight
-      case (Some(x), Some(y)) => // Pick the lesser
-        Math.min(ratio (d._1, None), ratio (None, d._2))
-    }
-    val r = ratio(requested)
-    AffineTransform.getScaleInstance(r, r)
-  }
-
-  private def requestedDimensions(): (Option[Int], Option[Int]) = {
-    def paramOption(k: String) = {
-      try {
-        multiParams(k).headOption map { _.toInt }
-      } catch {
-        case e: NumberFormatException => None
-      }
-    }
-    (paramOption("width"), paramOption("height"))
+    cw.toString()
   }
 
   private def paramOrBlank(k: String) = try {
