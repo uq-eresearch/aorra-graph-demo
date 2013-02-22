@@ -12,7 +12,7 @@ object AorraGraphDemoBuild extends Build {
   val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.10.0"
   val ScalatraVersion = "2.2.0"
-  val BatikVersion = "1.6-1"
+  val BatikVersion = "1.7"
 
   lazy val project = Project (
     "aorra-graph-demo",
@@ -30,13 +30,14 @@ object AorraGraphDemoBuild extends Build {
         "org.scalamock" %% "scalamock-scalatest-support" % "3.0.1" % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.6" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.8.v20121106" % "compile;container",
-"org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "compile;container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar")),
+        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "compile;container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar")),
         "commons-io" % "commons-io" % "2.3",
         "org.jfree" % "jfreechart" % "1.0.14",
         "org.apache.commons" % "commons-lang3" % "3.1",
         "com.google.guava" % "guava" % "12.0",
-        "batik" % "batik-rasterizer" % BatikVersion,
-        "batik" % "batik-svggen" % BatikVersion
+        "org.apache.xmlgraphics" % "batik-codec" % BatikVersion,
+        "org.apache.xmlgraphics" % "batik-rasterizer" % BatikVersion,
+        "org.apache.xmlgraphics" % "batik-svggen" % BatikVersion
       ),
       scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(

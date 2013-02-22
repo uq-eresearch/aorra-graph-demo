@@ -9,9 +9,9 @@ import org.jfree.data.category.CategoryDataset
 import org.jfree.chart.title.TextTitle
 import ereefs.content.Content
 import au.edu.uq.aorra.charts.{
-  ChartData, GrazingPracticeChart, LandPracticeChart, SvgWrapper}
+  ChartData, ChartRenderer, GrazingPracticeChart, LandPracticeChart, SvgWrapper}
 import ereefs.charts.{
-  CategoryDatasetBuilder, ChartContentWrapper, ChartRenderer,
+  CategoryDatasetBuilder, ChartContentWrapper,
   DimensionsWrapper, ProgressChart, ProgressChartBuilder}
 import ereefs.images._
 import java.util.NoSuchElementException
@@ -26,6 +26,9 @@ import org.apache.batik.dom.svg.SVGDOMImplementation
 import org.w3c.dom.svg.SVGDocument
 import org.apache.batik.svggen.SVGGraphics2D
 import java.io.CharArrayWriter
+import scala.collection.JavaConversions._
+import org.apache.batik.svggen.DefaultImageHandler
+import org.apache.batik.svggen.DefaultExtensionHandler
 
 class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
@@ -37,7 +40,31 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     mustache("/index", "runtime" -> runtime)
   }
 
-  get("/grazing-practice-chart") {
+  get("/grazing-practice-chart.:format") {
+    val f = grazingPracticeChart.toFormat(params("format"))
+    f.mimetype foreach { contentType = _ }
+    f.apply getOrElse halt(400, "Unsupported image format requested.")
+  }
+
+  get("/indicator-chart.:format") {
+    val f = indicatorChart.toFormat(params("format"))
+    f.mimetype foreach { contentType = _ }
+    f.apply getOrElse halt(400, "Unsupported image format requested.")
+  }
+
+  get("/land-practice-chart.:format") {
+    val f = landPracticeChart.toFormat(params("format"))
+    f.mimetype foreach { contentType = _ }
+    f.apply getOrElse halt(400, "Unsupported image format requested.")
+  }
+
+  get("/progress-chart.:format") {
+    val f = progressChart.toFormat(params("format"))
+    f.mimetype foreach { contentType = _ }
+    f.apply getOrElse halt(400, "Unsupported image format requested.")
+  }
+
+  private def grazingPracticeChart = {
     import ChartData._
 
     val data = mapParamsToData(grazingParamMap)
@@ -48,12 +75,11 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     val dimension = new Dimension(500, 500)
     val wrapper = new DimensionsWrapper(chart, dimension)
 
-    val content = new ChartContentWrapper(wrapper)
-    contentType = content.getContentType
-    transformToBytes(content)
+    val svg = (new ChartRenderer(wrapper)).render()
+    SvgWrapper(svg, params.getAs[Int]("width"), params.getAs[Int]("height"))
   }
 
-  get("/indicator-chart") {
+  private def indicatorChart() = {
     val chart = new BeerCoaster()
     BeerCoaster.Category.values.foreach({ category =>
       conditionOption(category.toString) map {
@@ -67,33 +93,22 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     })
     conditionOption("overall") map { chart.setOverallCondition(_) }
 
-    val content = new ChartContentWrapper(chart)
-    contentType = content.getContentType
-    transformToBytes(content)
+    val svg = (new ChartRenderer(chart)).render()
+    SvgWrapper(svg, params.getAs[Int]("width"), params.getAs[Int]("height"))
   }
 
-  get("/land-practice-chart") {
+  private def landPracticeChart() = {
     val chart = (new LandPracticeChart(
         (paramOrBlank("pLabel"),paramOrBlank("cLabel")))).createChart(
                 paramOrBlank("title"), mapParamsToData(landParamMap))
     val wrapper = new DimensionsWrapper(chart, new Dimension(500, 500))
 
-    contentType = "image/svg+xml"
-    val svg = (new au.edu.uq.aorra.charts.ChartRenderer(wrapper)).render()
-    SvgWrapper(svg).toSVG
+    val svg = (new ChartRenderer(wrapper)).render()
+    SvgWrapper(svg, params.getAs[Int]("width"), params.getAs[Int]("height"))
   }
 
-  get("/progress-chart") {
-    contentType = "image/svg+xml"
-    SvgWrapper(svgProgressChart).toSVG
-  }
 
-  get("/progress-chart.png") {
-    contentType = "image/png"
-    SvgWrapper(svgProgressChart).toPNG
-  }
-
-  private def svgProgressChart() = {
+  private def progressChart() = {
     val builder = new ProgressChartBuilder(
         paramOrBlank("tl"),
         paramOrBlank("tr"),
@@ -103,7 +118,8 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
       case None => halt(400, """Parameter "value" is required.""")
     })
 
-    renderSvgProgressChart(chart)
+    val svg = renderSvgProgressChart(chart)
+    SvgWrapper(svg, params.getAs[Int]("width"), params.getAs[Int]("height"))
   }
 
   private def renderSvgProgressChart(
@@ -114,7 +130,11 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     val doc = impl.createDocument(svgNS, "svg", null).asInstanceOf[SVGDocument]
 
     // Create an instance of the SVG Generator.
-    val g2 = new SVGGraphics2D(doc)
+    val g2 = new SVGGraphics2D(doc,
+        new DefaultImageHandler(),
+        new DefaultExtensionHandler(),
+        true
+    )
 
     val d = chart.getMinDimension
     g2.setRenderingHint(

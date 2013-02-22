@@ -210,7 +210,7 @@
             </div>
           </div>
           <div class="span6">
-            <img class="default"/>
+            <img class="png"/>
           </div>
         </div>
       </fieldset>
@@ -337,9 +337,7 @@
             </div>
           </div>
           <div class="span6">
-            <div>
-              <div class="svg"> </div>
-            </div>
+            <img class="svg"/>
           </div>
         </div>
       </fieldset>
@@ -557,7 +555,7 @@
             </div>
           </div>
           <div class="span6">
-            <img class="default"/>
+            <img class="png"/>
           </div>
         </div>
       </fieldset>
@@ -569,8 +567,8 @@
       var fadeIn = function() { $img.fadeIn(200) };
       $img.on('load error', fadeIn);
       $img.fadeOut(200);
-      $img.filter('div.svg').load($(this).attr('id'), serialize, fadeIn);
-      $img.filter('img.default').attr('src', $(this).attr('id')+'?'+serialize);
+      $img.filter('div.svg').load($(this).attr('id')+".svg", serialize, fadeIn);
+      $img.filter('img.svg').attr('src', $(this).attr('id')+".svg"+'?'+serialize);
       $img.filter('img.png').attr('src', $(this).attr('id')+'.png?'+serialize);
       return false;
     });
