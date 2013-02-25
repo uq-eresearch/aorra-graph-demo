@@ -43,25 +43,25 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
   get("/grazing-practice-chart.:format") {
     val f = grazingPracticeChart.toFormat(params("format"))
     f.mimetype foreach { contentType = _ }
-    f.apply getOrElse halt(400, "Unsupported image format requested.")
+    f.output getOrElse halt(400, "Unsupported image format requested.")
   }
 
   get("/indicator-chart.:format") {
     val f = indicatorChart.toFormat(params("format"))
     f.mimetype foreach { contentType = _ }
-    f.apply getOrElse halt(400, "Unsupported image format requested.")
+    f.output getOrElse halt(400, "Unsupported image format requested.")
   }
 
   get("/land-practice-chart.:format") {
     val f = landPracticeChart.toFormat(params("format"))
     f.mimetype foreach { contentType = _ }
-    f.apply getOrElse halt(400, "Unsupported image format requested.")
+    f.output getOrElse halt(400, "Unsupported image format requested.")
   }
 
   get("/progress-chart.:format") {
     val f = progressChart.toFormat(params("format"))
     f.mimetype foreach { contentType = _ }
-    f.apply getOrElse halt(400, "Unsupported image format requested.")
+    f.output getOrElse halt(400, "Unsupported image format requested.")
   }
 
   private def grazingPracticeChart = {

@@ -14,8 +14,8 @@ import java.io.CharArrayWriter
 import ereefs.charts.GraphUtils
 import java.awt.GraphicsEnvironment
 import java.awt.Font
-import org.apache.batik.svggen.DefaultImageHandler
 import org.apache.batik.svggen.DefaultExtensionHandler
+import org.apache.batik.svggen.ImageHandlerBase64Encoder
 
 class ChartRenderer(val chart: Dimensions) {
 
@@ -29,7 +29,8 @@ class ChartRenderer(val chart: Dimensions) {
 
     // Create an instance of the SVG Generator.
     val g2 = new SVGGraphics2D(doc,
-        new DefaultImageHandler(),
+        // Turn BufferedImage textures into "data:image/png" URIs
+        new ImageHandlerBase64Encoder(),
         new DefaultExtensionHandler(),
         true // Render text as paths to avoid missing fonts
     )

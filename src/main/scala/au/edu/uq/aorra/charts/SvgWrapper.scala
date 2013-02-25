@@ -25,11 +25,11 @@ object SvgWrapper {
   }
 
   abstract class ImageFormat {
-    def apply: Option[Any]
+    def output: Option[Any]
     def mimetype: Option[String]
   }
   case class UnsupportedFormat extends ImageFormat {
-    def apply() = None
+    def output() = None
     def mimetype: Option[String] = None
   }
 
@@ -43,7 +43,7 @@ class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
     val d: Document,
     val t: Transcoder) extends ImageFormat {
     def mimetype = Some(m)
-    def apply() = {
+    def output() = {
       val os = new ByteArrayOutputStream()
       t.transcode(new TranscoderInput(d), new TranscoderOutput(os))
       Some(os.toByteArray())
@@ -55,7 +55,7 @@ class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
     val d: Document,
     val t: Transcoder) extends ImageFormat {
     def mimetype = Some(m)
-    def apply() = {
+    def output() = {
       val w = new StringWriter()
       t.transcode(new TranscoderInput(d), new TranscoderOutput(w))
       Some(w.toString())
