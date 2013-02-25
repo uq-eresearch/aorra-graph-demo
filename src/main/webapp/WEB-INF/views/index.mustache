@@ -32,6 +32,9 @@
       margin-right: 18px;
     }
 
+    form .dropdown .dropdown-menu {
+       top: 0;
+    }
     </style>
   </head>
   <body>
@@ -75,20 +78,6 @@
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="width">Dimensions</label>
-              <div class="controls">
-                <div class="input-append">
-                  <input class="span1 text-r21.0ight" type="text" name="width"/>
-                  <span class="add-on">px</span>
-                </div>
-                &times;
-                <div class="input-append">
-                  <input class="span1 text-right" type="text" name="height"/>
-                  <span class="add-on">px</span>
-                </div>
-              </div>
-            </div>
-            <div class="control-group">
               <div class="controls">
                 <button class="btn" type="submit">
                   <i class="icon-bar-chart"> </i>
@@ -98,24 +87,22 @@
             </div>
           </div>
           <div class="span6">
-            <ul class="thumbnails">
-              <li>
-                <div class="thumbnail">
-                  <div class="svg"> </div>
-                  <div class="caption text-center">
-                    <p>As vector image (SVG)</p>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="thumbnail ">
-                  <img class="png"/>
-                  <div class="caption text-center">
-                    <p>As rastered image (PNG)</p>
-                  </div>
-                </div>
-              </li>
-            </ul>
+            <div class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <img class="png"/>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="pdf" href="#">
+                  <i class="icon-file-alt"> </i>PDF</a>
+                </li>
+                <li><a class="png" href="#">
+                  <i class="icon-picture"> </i>Large PNG</a>
+                </li>
+                <li><a class="svg" href="#">
+                  <i class="icon-file"> </i>SVG</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </fieldset>
@@ -210,7 +197,22 @@
             </div>
           </div>
           <div class="span6">
-            <img class="png"/>
+            <div class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <img class="png"/>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="pdf" href="#">
+                  <i class="icon-file-alt"> </i>PDF</a>
+                </li>
+                <li><a class="png" href="#">
+                  <i class="icon-picture"> </i>Large PNG</a>
+                </li>
+                <li><a class="svg" href="#">
+                  <i class="icon-file"> </i>SVG</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </fieldset>
@@ -337,7 +339,22 @@
             </div>
           </div>
           <div class="span6">
-            <img class="svg"/>
+            <div class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <img class="png"/>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="pdf" href="#">
+                  <i class="icon-file-alt"> </i>PDF</a>
+                </li>
+                <li><a class="png" href="#">
+                  <i class="icon-picture"> </i>Large PNG</a>
+                </li>
+                <li><a class="svg" href="#">
+                  <i class="icon-file"> </i>SVG</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </fieldset>
@@ -555,21 +572,40 @@
             </div>
           </div>
           <div class="span6">
-            <img class="png"/>
+            <div class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <img class="png"/>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="pdf" href="#">
+                  <i class="icon-file-alt"> </i>PDF</a>
+                </li>
+                <li><a class="png" href="#">
+                  <i class="icon-picture"> </i>Large PNG</a>
+                </li>
+                <li><a class="svg" href="#">
+                  <i class="icon-file"> </i>SVG</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </fieldset>
     </form>
     <script type="text/javascript">
     $('form').submit(function() {
-      var serialize = $(this).serialize();
-      var $img = $(this).find('img, div.svg');
+      var $img = $(this).find('img.png');
       var fadeIn = function() { $img.fadeIn(200) };
+      var hrefForFormat = _.bind(function(format, extraParams) {
+        var extra = _.isUndefined(extraParams) ? '' : "&"+extraParams;
+        return $(this).attr('id')+'.'+format+'?'+$(this).serialize()+extra;
+      }, this);
       $img.on('load error', fadeIn);
       $img.fadeOut(200);
-      $img.filter('div.svg').load($(this).attr('id')+".svg", serialize, fadeIn);
-      $img.filter('img.svg').attr('src', $(this).attr('id')+".svg"+'?'+serialize);
-      $img.filter('img.png').attr('src', $(this).attr('id')+'.png?'+serialize);
+      $(this).find('a.pdf').attr('href', hrefForFormat('pdf'));
+      $(this).find('a.png').attr('href', hrefForFormat('png', "width=1024"));
+      $(this).find('a.svg').attr('href', hrefForFormat('svg'));
+      $img.attr('src', hrefForFormat('png'));
       return false;
     });
     $('button[type="submit"]').click();

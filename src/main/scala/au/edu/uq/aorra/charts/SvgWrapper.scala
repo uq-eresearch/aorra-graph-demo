@@ -13,10 +13,10 @@ import java.awt.RenderingHints
 import java.lang.reflect.Field
 import org.apache.batik.transcoder.SVGAbstractTranscoder
 import org.apache.fop.svg.PDFTranscoder
-import org.apache.fop.render.ps.EPSTranscoder
-import org.apache.batik.transcoder.image.JPEGTranscoder
+import org.apache.batik.transcoder.image.TIFFTranscoder
 import org.apache.batik.transcoder.Transcoder
 import org.w3c.dom.Document
+import java.net.URI
 
 object SvgWrapper {
   def apply(svg: String) = new SvgWrapper(svg, None, None)
@@ -38,7 +38,7 @@ object SvgWrapper {
 class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
   import SvgWrapper._
 
-  case class RasterFormat(
+  case class BinaryFormat(
     val m: String,
     val d: Document,
     val t: Transcoder) extends ImageFormat {
@@ -50,7 +50,7 @@ class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
     }
 
   }
-  case class VectorFormat(
+  case class TextFormat(
     val m: String,
     val d: Document,
     val t: Transcoder) extends ImageFormat {
@@ -63,18 +63,17 @@ class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
   }
 
   def toFormat(format: String): ImageFormat = format match {
-    case "eps" =>
-      VectorFormat("application/postscript", doc(true), new EPSTranscoder())
+    // EPS support is omitted, as it can't handle transparency or patterns:
+    // http://wiki.apache.org/xmlgraphics-batik/PdfTranscoder#Known_issues
     case "pdf" =>
-      VectorFormat("application/pdf", doc(true), new PDFTranscoder())
+      BinaryFormat("application/pdf", doc(),
+          withDimensions(new PDFTranscoder()))
     case "svg" =>
-      VectorFormat("image/svg+xml", doc(true), new SVGTranscoder())
-    case "jpg" =>
-      RasterFormat("image/jpeg", doc(false),
-        withDimensions(new JPEGTranscoder()))
+      TextFormat("image/svg+xml", doc(true), new SVGTranscoder())
+    case "tiff" =>
+      BinaryFormat("image/tiff", doc(), withDimensions(new TIFFTranscoder()))
     case "png" =>
-      RasterFormat("image/png", doc(false),
-        withDimensions(new PNGTranscoder()))
+      BinaryFormat("image/png", doc(), withDimensions(new PNGTranscoder()))
     case _ => UnsupportedFormat()
   }
 
@@ -91,7 +90,7 @@ class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
   def toPNG = toFormat("png")
   def toSVG = toFormat("svg")
 
-  private def doc(relativeDimensions: Boolean) = {
+  private def doc(relativeDimensions: Boolean = false) = {
     // Turn back into DOM
     val parserName = XMLResourceDescriptor.getXMLParserClassName()
     val f = new SAXSVGDocumentFactory(parserName)

@@ -17,14 +17,14 @@ class AorraGraphDemoSpec extends ScalatraSpec {
 
     describe("GET /progress-chart") {
       it("should return status 400") {
-        get("/progress-chart") {
+        get("/progress-chart.svg") {
           status should equal (400)
         }
       }
 
       describe("with value=42") {
         it("should return status 200") {
-          get("/progress-chart?value=42") {
+          get("/progress-chart.svg?value=42") {
             status should equal (200)
           }
         }

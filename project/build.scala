@@ -37,7 +37,8 @@ object AorraGraphDemoBuild extends Build {
         "com.google.guava" % "guava" % "12.0",
         "org.apache.xmlgraphics" % "batik-codec" % BatikVersion,
         "org.apache.xmlgraphics" % "batik-rasterizer" % BatikVersion,
-        "org.apache.xmlgraphics" % "batik-svggen" % BatikVersion
+        "org.apache.xmlgraphics" % "batik-svggen" % BatikVersion,
+        "org.apache.xmlgraphics" % "fop" % "1.0"
       ),
       scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(
@@ -51,6 +52,6 @@ object AorraGraphDemoBuild extends Build {
       },
       mainClass in Compile := Some("JettyLauncher")
     )
-  )
+  ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*)
 
 }
