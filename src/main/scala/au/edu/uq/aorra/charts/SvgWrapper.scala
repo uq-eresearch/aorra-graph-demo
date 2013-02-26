@@ -87,9 +87,6 @@ class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
     t
   }
 
-  def toPNG = toFormat("png")
-  def toSVG = toFormat("svg")
-
   private def doc(relativeDimensions: Boolean = false) = {
     // Turn back into DOM
     val parserName = XMLResourceDescriptor.getXMLParserClassName()
