@@ -78,17 +78,11 @@ class SvgWrapper(svg: String, width: Option[Int], height: Option[Int]) {
   }
 
   private def withDimensions(t: Transcoder) = {
-    width.foreach { w =>
-      t.addTranscodingHint(SVGAbstractTranscoder.KEY_WIDTH, w.toFloat)
-    }
-    height.foreach { h =>
-      t.addTranscodingHint(SVGAbstractTranscoder.KEY_HEIGHT, h.toFloat)
-    }
+    import SVGAbstractTranscoder._
+    width.foreach  { w => t.addTranscodingHint(KEY_WIDTH,  w.toFloat) }
+    height.foreach { h => t.addTranscodingHint(KEY_HEIGHT, h.toFloat) }
     t
   }
-
-  def toPNG = toFormat("png")
-  def toSVG = toFormat("svg")
 
   private def doc(relativeDimensions: Boolean = false) = {
     // Turn back into DOM
