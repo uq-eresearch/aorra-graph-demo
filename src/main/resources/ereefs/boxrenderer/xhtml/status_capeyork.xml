@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+<head>
+<title>Cape York Progress and status</title>
+<link rel="stylesheet" type="text/css" href="status.css" />
+<style type="text/css">
+.theme1 {
+    background-color: #E1A06E;
+}
+.theme2 {
+    background-color: #C46515;
+    color: white;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<table>
+<tr><td colspan="0" class="theme1 heading">Progress and status</td></tr>
+<tr>
+    <td colspan="2" rowspan="2" class="theme2 heading">Targets</td>
+    <td rowspan="2" class="theme1 region_caption" style="border-right-width:2px;"><span class="box_rotate">Region</span></td>
+    <td rowspan="2" class="theme2 fakeborder" style="border-right-width:2px;"></td>
+    <td colspan="0" class="theme2" style="font-size: 12pt;">Catchments</td>
+</tr>
+<tr>
+    <td class="theme1 region_caption"><span class="box_rotate">Endeavour</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Jacky Jacky<br/>creek</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Jeannie</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Lockhart</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Normanby</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Olive-Pascoe</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Stewart</span></td>
+</tr>
+<tr>
+    <td rowspan="2" class="caption">% adoption<br/>improved<br/>practices</td>
+    <td>Grazing</td>
+    <td colspan="0" class="verygood">25</td>
+</tr>
+<tr>
+    <td>Horticulture</td>
+    <td colspan="0" class="moderate">25</td>
+</tr>
+<tr>
+    <td rowspan="2" class="caption">% loss</td>
+    <td>Wetlands</td>
+    <td class="verygood" style="border-right-width:2px;">0</td>
+    <td rowspan="2" class="theme2 fakeborder" style="border-right-width:2px;"></td>
+    <td class="verypoor">0.5</td>
+    <td class="moderate">0.5</td>
+    <td class="poor">0.5</td>
+    <td class="verygood">0.5</td>
+    <td class="moderate">0.5</td>
+    <td class="poor">0.5</td>
+    <td class="verygood">0.5</td>
+</tr>
+<tr>
+    <td>Riparian</td>
+    <td class="moderate" style="border-right-width:2px;">0.5</td>
+    <td class="verygood">0.5</td>
+    <td class="verypoor">0.5</td>
+    <td class="good">0.5</td>
+    <td class="poor">0.5</td>
+    <td class="moderate">0.5</td>
+    <td class="moderate">0.5</td>
+    <td class="good">0.5</td>
+</tr>
+<tr>
+    <td colspan="2" class="theme2 caption" style="text-align: left;">Overall marine condition</td>
+    <td colspan="0" class="moderate_hatching"></td>
+</tr>
+<tr>
+    <td colspan="2" class="caption">Water quality</td>
+    <td colspan="0" class="moderate_hatching"></td>
+</tr>
+<tr>
+    <td colspan="2" class="caption">Seagrass</td>
+    <td colspan="0" class="poor_hatching"></td>
+</tr>
+<tr>
+    <td colspan="2" class="caption">Corals</td>
+    <td colspan="0" class="not_evaluated">N/E</td>
+</tr>
+<tr>
+    <td colspan="0" class="legend">
+    <table>
+<tr>
+    <td colspan="3" class="legend" style="height: 5px;"></td>
+</tr>
+<tr class="legend">
+<td rowspan="2" class="legend">
+<table>
+<tr><td class="legend" style="width: 100px;"><span class="verygood legendbox"></span>Very good</td></tr>
+<tr><td class="legend"><span class="good legendbox"></span>Good</td></tr>
+<tr><td class="legend"><span class="moderate legendbox"></span>Moderate</td></tr>
+<tr><td class="legend"><span class="poor legendbox"></span>Poor</td></tr>
+<tr><td class="legend"><span class="verypoor legendbox"></span>Very poor</td></tr>
+</table>
+</td>
+<td rowspan="2" class="legend" style="vertical-align:top;"><span class="legend_hatching legendbox"></span></td>
+<td class="legend" style="vertical-align:top;">
+Hatching indicates low confidence due<br/>
+to limited data availability or limited<br/>
+validation for seagrass and water quality</td>
+</tr>
+<tr><td class="legend" style="vertical-align:bottom;">N/E Not Evaluated</td></tr>
+</table>    </td>
+</tr>
+</table>
+</body>
+</html>
