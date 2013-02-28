@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+<head>
+<title>Burdekin Progress and status</title>
+<link rel="stylesheet" type="text/css" href="status.css" />
+<style type="text/css">
+.theme1 {
+    background-color: #ABA998;
+}
+.theme2 {
+    background-color: #676651;
+    color: white;
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<table>
+<tr><td colspan="0" class="theme1 heading">Progress and status</td></tr>
+<tr>
+    <td colspan="2" rowspan="2" class="theme2 heading">Targets</td>
+    <td rowspan="2" class="theme1 region_caption" style="border-right-width:2px;"><span class="box_rotate">Region</span></td>
+    <td rowspan="2" class="theme2 fakeborder" style="border-right-width:2px;"></td>
+    <td colspan="0" class="theme2" style="font-size: 12pt;">Catchments</td>
+</tr>
+<tr>
+    <td class="theme1 region_caption"><span class="box_rotate">Black</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Burdekin</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Don</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Haughton</span></td>
+    <td class="theme1 region_caption"><span class="box_rotate">Ross</span></td>
+</tr>
+<tr>
+    <td rowspan="3" class="caption">%<br/>adoption<br/>improved<br/>practices</td>
+    <td>Grazing</td>
+    <td colspan="0" class="good">25</td>
+</tr>
+<tr>
+    <td>Horticulture</td>
+    <td colspan="0" class="verygood">25</td>
+</tr>
+<tr>
+    <td>Sugarcane</td>
+    <td colspan="0" class="moderate">25</td>
+</tr>
+<tr>
+    <td rowspan="2" class="caption">% loss</td>
+    <td>Wetlands</td>
+    <td class="good" style="border-right-width:2px;">0.5</td>
+    <td rowspan="3" class="theme2 fakeborder" style="border-right-width:2px;"></td>
+    <td class="verypoor">0.5</td>
+    <td class="good">0.5</td>
+    <td class="moderate">-0.5</td>
+    <td class="poor">-0.5</td>
+    <td class="verygood">-0.5</td>
+</tr>
+<tr>
+    <td>Riparian</td>
+    <td class="moderate" style="border-right-width:2px;">0.5</td>
+    <td class="poor">0.5</td>
+    <td class="moderate">0.5</td>
+    <td class="moderate">0.5</td>
+    <td class="moderate">0.5</td>
+    <td class="poor">0.5</td>
+</tr>
+<tr>
+    <td colspan="2" class="caption">% groundcover</td>
+    <td class="verygood" style="border-right-width:2px;">75</td>
+    <td class="good">75</td>
+    <td class="moderate">75</td>
+    <td class="poor">75</td>
+    <td class="verypoor">75</td>
+    <td class="verygood">75</td>
+</tr>
+<tr>
+    <td rowspan="4" class="caption">% load<br/>reduction</td>
+    <td>Nitrogen</td>
+    <td colspan="0" class="good">5</td>
+</tr>
+<tr>
+    <td>Phosphorus</td>
+    <td colspan="0" class="good">5</td>
+</tr>
+<tr>
+    <td>Sediment</td>
+    <td colspan="0" class="verygood">5</td>
+</tr>
+<tr>
+    <td>Pesticides</td>
+    <td colspan="0" class="verygood">5</td>
+</tr>
+<tr>
+    <td colspan="2" class="theme2 caption" style="text-align: left;">Overall marine condition</td>
+    <td colspan="0" class="verygood"></td>
+</tr>
+<tr>
+    <td colspan="2" class="caption">Water quality</td>
+    <td colspan="0" class="good"></td>
+</tr>
+<tr>
+    <td colspan="2" class="caption">Seagrass</td>
+    <td colspan="0" class="poor"></td>
+</tr>
+<tr>
+    <td colspan="2" class="caption">Corals</td>
+    <td colspan="0" class="verypoor"></td>
+</tr>
+<tr>
+    <td colspan="0" class="legend">
+    <table>
+<tr>
+    <td colspan="2" class="legend" style="height: 5px;"></td>
+</tr>
+<tr class="legend">
+    <td class="legend" style="width: 100px;"><span class="verygood legendbox"></span>Very good</td>
+    <td class="legend"><span class="poor legendbox"></span>Poor</td>
+</tr>
+<tr class="legend">
+    <td class="legend"><span id="debug" class="good legendbox"></span>Good</td>
+    <td class="legend"><span class="verypoor legendbox"></span>Very poor</td>
+</tr>
+<tr class="legend">
+    <td colspan="2" class="legend"><span class="moderate legendbox"></span>Moderate</td>
+</tr>
+</table>    </td>
+</tr>
+</table>
+</body>
+</html>

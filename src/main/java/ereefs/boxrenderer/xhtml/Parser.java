@@ -1,10 +1,5 @@
 package ereefs.boxrenderer.xhtml;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,12 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jfree.ui.RefineryUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -63,9 +54,18 @@ public class Parser {
         inherited.add("color");
     }
 
-    private List<Rule> cssrules = Lists.newArrayList();
+    private List<Rule> cssrules;
+
+    public Parser() {
+    	
+    }
+
+    public Parser(Resolver resolver) {
+    	this.resolver = resolver;
+    }
 
     public Box parse(InputStream in) throws Exception {
+        cssrules = Lists.newArrayList();
         Document doc = XmlUtils.parse(new InputSource(in));
         Element elRoot = doc.getDocumentElement();
         return parse(null, elRoot);
@@ -269,38 +269,6 @@ public class Parser {
             String css = IOUtils.toString(in);
             cssrules.addAll(CSSParser.parse(css));
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        final Box box  = new Parser().parse(new FileInputStream("/home/uqageber/workspace/ereefs/local/" +
-                "ereefs/2nd-report-card/burdekin/assets/status.png.xhtml"));
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JFrame frame = new JFrame("Box renderer test xhtml");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.getContentPane().add(new JPanel(){
-                    @Override
-                    public Dimension getPreferredSize() {
-                        return new Dimension(500, 500);
-                    }
-
-                    @Override
-                    public void paintComponent(Graphics g) {
-                        Graphics2D g2 = (Graphics2D)g;
-                        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                        try {
-                            box.render(g2);
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
-                frame.pack();
-                RefineryUtilities.centerFrameOnScreen(frame);
-                frame.setVisible(true);
-            }
-        });
     }
 
     public Resolver getResolver() {

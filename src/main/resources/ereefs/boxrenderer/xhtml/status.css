@@ -1,0 +1,115 @@
+body {
+    font-family: Arial;
+    background-color: grey;
+    margin: 0px;
+}
+table, th, td {
+    font-size: 12pt;
+    border-color: white;
+    border-style:solid;
+    border-width:3px;
+    border-collapse:collapse;
+    background-color: #E3E3E4;
+    padding: 2px;
+}
+.verygood {
+    background-color: #007646;
+    color: white;
+    text-align: center;
+}
+.good {
+    background-color: #A4C1A3;
+    text-align: center;
+}
+.moderate {
+    background-color: #F4C33A;
+    text-align: center;
+}
+.poor {
+    background-color: #EF8940;
+    text-align: center;
+}
+.verypoor {
+    background-color: #DF412F;
+    text-align: center;
+}
+.caption {
+    font-weight:bold;
+}
+.region_caption {
+    font-size: 12pt;
+    font-weight:bold;
+    text-align: center;
+    vertical-align: bottom;
+    width: 30px;
+}
+.heading {
+    font-size: 16pt;
+    font-weight:bold;
+    padding: 10px;
+}
+.fakeborder {
+    width: 2px;
+    padding: 0px; 
+}
+.legendbox {
+    float: left;
+    width: 10px;
+    height: 10px;
+    margin: 1px;
+    margin-right: 3px;
+}
+.legend {
+    border-width:1px;
+    background-color: white;
+    padding: 0px;
+}
+
+.box_rotate {
+    -moz-transform: rotate(-90deg);  /* FF3.5+ */
+    -moz-transform-origin: center center;
+    /*-o-transform: rotate(-90deg);*/  /* Opera 10.5 */
+    /*-webkit-transform: rotate(-90deg);*/  /* Saf3.1+, Chrome */
+    /*filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=3); */ /* IE6,IE7 */
+    /*-ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=3)";*/ /* IE8 */
+    /*height: 75px;*/
+    /*width: 15px;*/
+    /*-fs-rotate: -90;*/
+    rotation:-90deg;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+.legend_hatching {
+    background-color: white;
+    background-texture: hatching black 3px 2px;
+}
+.verygood_hatching {
+    background-color: white;
+    background-texture: hatching #007646 10px 3px;
+    color: white;
+    text-align: center;
+}
+.good_hatching {
+    background-color: white;
+    background-texture: hatching #A4C1A3 10px 3px;
+    text-align: center;
+}
+.moderate_hatching {
+    background-color: white;
+    background-texture: hatching #F4C33A 10px 3px;
+    text-align: center;
+}
+.poor_hatching {
+    background-color: white;
+    background-texture: hatching #EF8940 10px 3px;
+    text-align: center;
+}
+.verypoor_hatching {
+    background-color: white;
+    background-texture: hatching #DF412F 10px 3px;
+    text-align: center;
+}
+.not_evaluated {
+    text-align: center;
+    background-color: #C9C9CA;
+}

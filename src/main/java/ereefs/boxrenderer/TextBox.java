@@ -39,7 +39,7 @@ public class TextBox extends AbstractBox {
         TextBlock block = TextUtilities.createTextBlock(text, font, getTextColor());
         Shape shape = block.calculateBounds(g2, 0, 0, TextBlockAnchor.TOP_LEFT, 0, 0, 0);
         Rectangle2D rect = shape.getBounds2D();
-        return new Dimension((int)rect.getMaxX(), (int)rect.getMaxY());
+        return new Dimension((int)rect.getMaxX()+1, (int)rect.getMaxY()+1);
     }
 
     private Paint getTextColor() {
