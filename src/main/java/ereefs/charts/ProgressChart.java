@@ -1,6 +1,6 @@
 package ereefs.charts;
 
-import static java.lang.Math.ceil;
+import static java.lang.Math.PI;
 import static java.lang.Math.min;
 
 import java.awt.Color;
@@ -11,7 +11,8 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.Arc2D;
+import java.awt.Shape;
+import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
@@ -39,7 +40,7 @@ public class ProgressChart implements Dimensions {
     private static final Color PROGRESS_COLOR = new Color(24,62,115);
     private static final int BAR_LENGTH = 250;
     private static final int BAR_HEIGHT = BAR_LENGTH*8/100;
-
+    
     private Dimension dimension;
 
     private String progressLabel;
@@ -91,7 +92,7 @@ public class ProgressChart implements Dimensions {
         TableCellBox progressBarBox = new TableCellBox(new ImageRenderBox(new ImageRenderer() {
             @Override
             public Dimension getDimension(Graphics2D g2) throws Exception {
-                return new Dimension(BAR_LENGTH, BAR_HEIGHT+2);
+                return new Dimension(BAR_LENGTH+2, BAR_HEIGHT+2);
             }
 
             @Override
@@ -109,57 +110,68 @@ public class ProgressChart implements Dimensions {
     }
 
     private void drawBar(Graphics2D g2) {
-        int w = g2.getClipBounds().width-2;
-        GraphUtils g = new GraphUtils(g2);
-        float capR = (float)(BAR_HEIGHT / 2);
-        int lx = (int) ceil(capR)+1;
-        int ly = 1;
-        int rx = (int)(w-ceil(capR));
-        int ry = 1;
-        int totalLength = rx-lx + (int)ceil(2 * capR);
-        int pLength = min((int)ceil((float)progress/100*totalLength), totalLength);
+        Shape barShape = createBarShape(BAR_LENGTH, BAR_HEIGHT);
+        Shape progressShape = createProgressShape(BAR_LENGTH, BAR_HEIGHT);
+        g2.translate(1, 1);
         g2.setColor(Color.white);
-        g.fillArc(lx, (int)(ly+ceil(capR)), capR, 90, 180);
-        g2.fillRect(lx, ly, rx-lx, BAR_HEIGHT);
-        g.fillArc(rx, (int)(ry+ceil(capR)), capR, -90, 180);
+        g2.fill(barShape);
         g2.setColor(PROGRESS_COLOR);
-        if(pLength>0) {
-            g.fillArc(lx, (int)(ly+ceil(capR)), capR, 90, 180);
-            // if the arc radius is bigger then the progress length then
-            // draw a white box on part of the arc to overwrite some of the fill.
-            // TODO might be an issue with transparency,
-            // think about using a fill cord instead (see Arc2D)
-            if(capR>pLength) {
-                g2.setColor(Color.white);
-                g2.fillRect((int)(lx-ceil(capR-pLength)), ly, totalLength, BAR_HEIGHT);
-            }
-        }
-        pLength -= capR;
-        int width = Math.min(pLength, rx-lx);
-        if(pLength>0) {
-            g2.setColor(PROGRESS_COLOR);
-            g2.fillRect(lx, ly, width, BAR_HEIGHT);
-        }
-        pLength -=width;
-        if(pLength>0) {
-            g.fillArc(rx, (int) (ry+Math.ceil(capR)), capR, -90, 180);
-            if(pLength<capR) {
-                g2.setColor(Color.white);
-                g2.fillRect(rx+pLength, ry, (int) ceil(capR), BAR_HEIGHT);
-            }
-        }
-        g.setColor(Color.black);
-        g2.drawLine(lx, ly, rx, ry);
-        g2.drawLine(lx, ly+BAR_HEIGHT, rx, ry+BAR_HEIGHT);
-        g.drawArc(lx, (int)(ly+ceil(capR)), capR, 90, 180, Arc2D.OPEN);
-        g.drawArc(rx, (int)(ry+ceil(capR)), capR, -90, 180, Arc2D.OPEN);
+        g2.fill(progressShape);
+        g2.setColor(Color.black);
+        g2.draw(barShape);
         g2.setColor(Color.white);
-
         g2.setFont(getBarFont());
         if(progressLabel!=null) {
             TextUtilities.drawAlignedString(String.format("%s", progressLabel),
-                    g2, lx-(int)ceil(capR/2), ly+(BAR_HEIGHT/2), TextAnchor.CENTER_LEFT);
+                    g2, BAR_HEIGHT/2, BAR_HEIGHT/2, TextAnchor.CENTER_LEFT);
         }
+    }
+
+    private Shape createBarShape(double width, double height) {
+        Path2D.Double barShape = new Path2D.Double();
+        double capR = height / 2;
+        double rx = width-capR;
+        GraphUtils.addArc(barShape, true, capR, -PI/2, -PI, capR, capR);
+        GraphUtils.addArc(barShape, false, capR, -PI, -3*PI/2, capR, capR);
+        barShape.lineTo(rx, barShape.getCurrentPoint().getY());
+        GraphUtils.addArc(barShape, false, capR, PI/2, 0, rx, capR);
+        GraphUtils.addArc(barShape, false, capR, 0, -PI/2, rx, capR);
+        barShape.closePath();
+        return barShape;
+    }
+
+    private Shape createProgressShape(double width, double height) {
+        Path2D.Double barShape = new Path2D.Double();
+        double capR = height / 2;
+        double rx = width-capR;
+        double progressLength = min(progress/100*width, width);
+        if(progressLength < capR) {
+            double alpha = Math.asin((capR-progressLength)/capR);
+            GraphUtils.addArc(barShape, true, capR, -PI/2-alpha, -PI, capR, capR);
+            GraphUtils.addArc(barShape, false, capR, -PI, -3*PI/2+alpha, capR, capR);
+        } else {
+            GraphUtils.addArc(barShape, true, capR, -PI/2, -PI, capR, capR);
+            GraphUtils.addArc(barShape, false, capR, -PI, -3*PI/2, capR, capR);
+            if(progressLength < (width-capR)) {
+                barShape.lineTo(progressLength, barShape.getCurrentPoint().getY());
+                barShape.lineTo(progressLength, 0);
+            } else {
+                barShape.lineTo(rx, barShape.getCurrentPoint().getY());
+                 if(progressLength < width) {
+                     double px = progressLength - (width - capR);
+                     double alpha = Math.asin(px/capR);
+                     GraphUtils.addArc(barShape, false, capR, PI/2, PI/2-alpha, rx, capR);
+                     barShape.lineTo(barShape.getCurrentPoint().getX(), 
+                             barShape.getCurrentPoint().getY() - 2*Math.cos(alpha)*capR);
+                     GraphUtils.addArc(barShape, false, capR, -PI/2+alpha, -PI/2, rx, capR);
+                } else {
+                  GraphUtils.addArc(barShape, false, capR, PI/2, 0, rx, capR);
+                  GraphUtils.addArc(barShape, false, capR, 0, -PI/2, rx, capR);
+                }
+            }
+        }
+        barShape.closePath();
+        return barShape;
     }
 
     public Dimension getMinDimension(Graphics2D g2) throws Exception {
@@ -270,9 +282,7 @@ public class ProgressChart implements Dimensions {
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 final ProgressChart chart = new ProgressChart();
-//                chart.setDimension(new Dimension(300, 50));
-                chart.setProgress(71f);
-                chart.setProgress(97f);
+                chart.setProgress(98.9f);
                 chart.setProgressLabel("0.29%");
                 chart.setTopLeftLabel("Horticulture");
                 chart.setTopRightLabel("2013 target");
@@ -287,8 +297,7 @@ public class ProgressChart implements Dimensions {
 
                     @Override
                     public Dimension getPreferredSize() {
-//                        return chart.getDimension();
-                        return new Dimension(300, 100);
+                        return new Dimension(800, 500);
                     }
 
                     @Override

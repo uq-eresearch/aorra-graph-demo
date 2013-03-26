@@ -14,6 +14,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -244,4 +245,79 @@ public class GraphUtils {
         }
         return result;
     }
+
+    /**
+     *  Cubic bezier approximation of a circular arc centered at the origin, 
+     *  from (radians) a1 to a2, where a2-a1 < pi/2.  The arc's radius is r.
+     * 
+     *  Returns an array of four points, where x1,y1 and x4,y4 are the arc's end points
+     *  and x2,y2 and x3,y3 are the cubic bezier's control points.
+     * 
+     *  This algorithm is based on the approach described in:
+     *  A. Riškus, "Approximation of a Cubic Bezier Curve by Circular Arcs and Vice Versa," 
+     *  Information Technology and Control, 35(4), 2006 pp. 371-378.
+     *  
+     *  Copied from PathArcUtils.as 
+     *  http://hansmuller-flex.blogspot.com.au/2011/10/more-about-approximating-circular-arcs.html
+     *  and translated into java
+     *  
+     * This work is licensed under the Creative Commons Attribution 3.0
+     * Unported License. To view a copy of this license, visit
+     * http://creativecommons.org/licenses/by/3.0/ or send a letter to
+     * Creative Commons, 444 Castro Street, Suite 900, Mountain View,
+     * California, 94041, USA.
+     */
+    // also read: http://www.whizkidtech.redprince.net/bezier/circle/
+    public static Point2D.Double[] createSmallArc(double r, double a1, double a2) {
+        Point2D.Double[] result = new Point2D.Double[4];
+        // Compute all four points for an arc that subtends the same total angle
+        // but is centered on the X-axis
+        double a = (a2 - a1) / 2.0;
+        double x4 = r * Math.cos(a);
+        double y4 = r * Math.sin(a);
+        double x1 = x4;
+        double y1 = -y4;
+        
+        double q1 = x1*x1 + y1*y1;
+        double q2 = q1 + x1*x4 + y1*y4;
+        double k2 = 4d/3d * (Math.sqrt(2 * q1 * q2) - q2) / (x1 * y4 - y1 * x4);
+        
+        double x2 = x1 - k2 * y1;
+        double y2 = y1 + k2 * x1;
+        double x3 = x2; 
+        double y3 = -y2;
+        
+        // Find the arc points' actual locations by computing x1,y1 and x4,y4 
+        // and rotating the control points by a + a1
+        
+        double ar = a + a1;
+        double cos_ar = Math.cos(ar);
+        double sin_ar = Math.sin(ar);
+        
+        result[0] = new Point2D.Double(r * Math.cos(a1), r * Math.sin(a1));
+        result[1] = new Point2D.Double(x2 * cos_ar - y2 * sin_ar, x2 * sin_ar + y2 * cos_ar);
+        result[2] = new Point2D.Double(x3 * cos_ar - y3 * sin_ar, x3 * sin_ar + y3 * cos_ar);
+        result[3] = new Point2D.Double(r * Math.cos(a2), r * Math.sin(a2));
+        return result;
+    }
+
+    /**
+     * Adds an arc to the path. The arc must be smaller or equal to pi/2 (90°)
+     * @param path - the path to add the arc to
+     * @param moveTo - if true adds a path.moveTo to the beginning of the arc 
+     * @param r - the radius of the arc
+     * @param a1 - the start angle in radians
+     * @param a2 - the end angle in radians
+     * @param x - translate by x on the x axis 
+     * @param y - translate by y on the y axis
+     */
+    public static Path2D addArc(Path2D path, boolean moveTo, double r, double a1, double a2, double x, double y) {
+        Point2D.Double[] arc = createSmallArc(r, a1, a2);
+        if(moveTo) {
+            path.moveTo(arc[0].x+x, arc[0].y+y);
+        }
+        path.curveTo(arc[1].x+x, arc[1].y+y, arc[2].x+x, arc[2].y+y, arc[3].x+x, arc[3].y+y);
+        return path;
+    }
+
 }
