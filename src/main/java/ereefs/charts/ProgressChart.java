@@ -9,7 +9,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.Path2D;
@@ -30,12 +29,15 @@ import ereefs.boxrenderer.ImageRenderer;
 import ereefs.boxrenderer.Margin;
 import ereefs.boxrenderer.TableBox;
 import ereefs.boxrenderer.TableCellBox;
-import ereefs.boxrenderer.TableCellBox.Align;
 import ereefs.boxrenderer.TableCellBox.VAlign;
 import ereefs.boxrenderer.TableRowBox;
 import ereefs.boxrenderer.TextBox;
 
 public class ProgressChart implements Dimensions {
+
+    public enum Align {
+        LEFT, RIGHT
+    }
 
     private static final Color PROGRESS_COLOR = new Color(24,62,115);
     private static final int BAR_LENGTH = 250;
@@ -44,6 +46,8 @@ public class ProgressChart implements Dimensions {
     private Dimension dimension;
 
     private String progressLabel;
+    private Align progressLabelAlign;
+    private Color progressLabelColor;
 
     private float progress;
 
@@ -75,13 +79,13 @@ public class ProgressChart implements Dimensions {
         // Push TL text up a little
         cellTL.getMargin().setBottom(3);
         TableCellBox cellTR = new TableCellBox(new TextBox(topRightLabel, regularFont));
-        cellTR.setAlign(Align.CENTER);
+        cellTR.setAlign(TableCellBox.Align.CENTER);
         cellTR.setValign(VAlign.BOTTOM);
         // Avoid TR text truncation
         cellTR.getMargin().setRight(5);
         TableCellBox cellBL = new TableCellBox(new TextBox(bottomLeftLabel, regularFont));
         TableCellBox cellBR = new TableCellBox(new TextBox(bottomRightLabel, regularFont));
-        cellBR.setAlign(Align.CENTER);
+        cellBR.setAlign(TableCellBox.Align.CENTER);
         TableRowBox row1 = new TableRowBox();
         TableRowBox row2 = new TableRowBox();
         TableRowBox row3 = new TableRowBox();
@@ -110,9 +114,9 @@ public class ProgressChart implements Dimensions {
     }
 
     private void drawBar(Graphics2D g2) {
+        g2.translate(1, 1);
         Shape barShape = createBarShape(BAR_LENGTH, BAR_HEIGHT);
         Shape progressShape = createProgressShape(BAR_LENGTH, BAR_HEIGHT);
-        g2.translate(1, 1);
         g2.setColor(Color.white);
         g2.fill(barShape);
         g2.setColor(PROGRESS_COLOR);
@@ -122,8 +126,22 @@ public class ProgressChart implements Dimensions {
         g2.setColor(Color.white);
         g2.setFont(getBarFont());
         if(progressLabel!=null) {
+            if(progressLabelColor != null) {
+                g2.setColor(progressLabelColor);
+            } else {
+                g2.setColor(Color.white);
+            }
+            float x;
+            TextAnchor anchor;
+            if(progressLabelAlign == null || progressLabelAlign == Align.LEFT) {
+                x = BAR_HEIGHT / 2;
+                anchor = TextAnchor.CENTER_LEFT;
+            } else {
+                x = BAR_LENGTH - BAR_HEIGHT / 2f;
+                anchor = TextAnchor.CENTER_RIGHT;
+            }
             TextUtilities.drawAlignedString(String.format("%s", progressLabel),
-                    g2, BAR_HEIGHT/2, BAR_HEIGHT/2, TextAnchor.CENTER_LEFT);
+                    g2, x, BAR_HEIGHT/2f, anchor);
         }
     }
 
@@ -275,19 +293,102 @@ public class ProgressChart implements Dimensions {
         return new Font("Liberation Sans", Font.BOLD, BAR_HEIGHT/10*7);
     }
 
+    public Align getProgressLabelAlign() {
+        return progressLabelAlign;
+    }
+
+    public void setProgressLabelAlign(Align progressLabelAlign) {
+        this.progressLabelAlign = progressLabelAlign;
+    }
+
+    public Color getProgressLabelColor() {
+        return progressLabelColor;
+    }
+
+    public void setProgressLabelColor(Color progressLabelColor) {
+        this.progressLabelColor = progressLabelColor;
+    }
+
 
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+
+            private TableCellBox getProgressChart(float progress, String progressLabel, String tl,
+                    String tr, String bl, String br, Align plAlign, Color plColor) {
                 final ProgressChart chart = new ProgressChart();
-                chart.setProgress(98.9f);
-                chart.setProgressLabel("0.29%");
-                chart.setTopLeftLabel("Horticulture");
-                chart.setTopRightLabel("2013 target");
-                chart.setBottomLeftLabel("0%");
-                chart.setBottomRightLabel("80%");
+                chart.setProgress(progress);
+                chart.setProgressLabel(progressLabel);
+                chart.setTopLeftLabel(tl);
+                chart.setTopRightLabel(tr);
+                chart.setBottomLeftLabel(bl);
+                chart.setBottomRightLabel(br);
+                chart.setProgressLabelAlign(plAlign);
+                chart.setProgressLabelColor(plColor);
+                TableCellBox progressBarBox = new TableCellBox(new ImageRenderBox(new ImageRenderer() {
+                    @Override
+                    public Dimension getDimension(Graphics2D g2) throws Exception {
+                        return chart.getMinDimension(g2);
+                    }
+
+                    @Override
+                    public void render(Graphics2D g2) throws Exception {
+                        Dimension d = getDimension(g2);
+                        Rectangle2D.Double rect = new Rectangle2D.Double(0,0, d.width, d.height);
+                        chart.draw(g2, rect);
+                    }}));
+                return progressBarBox;
+            }
+
+            private TableBox buildTable() {
+                TableBox table = new TableBox();
+                {
+                    TableRowBox row = new TableRowBox();
+                    row.addCell(getProgressChart(
+                        1.5f, "1.5%", "Horticulture", "2013 target", "0%", "100%", Align.LEFT, Color.white));
+                    row.addCell(getProgressChart(
+                        33f, "33%", "Horticulture", "2013 target", "0%", "100%", Align.LEFT, Color.white));
+                    row.addCell(getProgressChart(
+                        98.5f, "98.5%", "Horticulture", "2013 target", "0%", "100%", Align.LEFT, Color.white));
+                    table.addRow(row);
+                }
+                {
+                    TableRowBox row = new TableRowBox();
+                    row.addCell(getProgressChart(
+                        1.5f, "1.5%", "Horticulture", "2013 target", "0%", "100%", Align.LEFT, Color.black));
+                    row.addCell(getProgressChart(
+                        33f, "33%", "Horticulture", "2013 target", "0%", "100%", Align.LEFT, Color.black));
+                    row.addCell(getProgressChart(
+                        98.5f, "98.5%", "Horticulture", "2013 target", "0%", "100%", Align.LEFT, Color.black));
+                    table.addRow(row);
+                }
+                {
+                    TableRowBox row = new TableRowBox();
+                    row.addCell(getProgressChart(
+                        1.5f, "1.5%", "Horticulture", "2013 target", "0%", "100%", Align.RIGHT, Color.white));
+                    row.addCell(getProgressChart(
+                        33f, "33%", "Horticulture", "2013 target", "0%", "100%", Align.RIGHT, Color.white));
+                    row.addCell(getProgressChart(
+                        98.5f, "98.5%", "Horticulture", "2013 target", "0%", "100%", Align.RIGHT, Color.white));
+                    table.addRow(row);
+                }
+                {
+                    TableRowBox row = new TableRowBox();
+                    row.addCell(getProgressChart(
+                        1.5f, "1.5%", "Horticulture", "2013 target", "0%", "100%", Align.RIGHT, Color.black));
+                    row.addCell(getProgressChart(
+                        33f, "33%", "Horticulture", "2013 target", "0%", "100%", Align.RIGHT, Color.black));
+                    row.addCell(getProgressChart(
+                        98.5f, "98.5%", "Horticulture", "2013 target", "0%", "100%", Align.RIGHT, Color.black));
+                    table.addRow(row);
+                }
+                return table;
+            }
+
+            public void run() {
+                final TableBox table = buildTable();
+                table.getMargin().setSize(5);
                 JFrame frame = new JFrame("Progress Chart Test");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.getContentPane().add(new JPanel() {
@@ -297,24 +398,21 @@ public class ProgressChart implements Dimensions {
 
                     @Override
                     public Dimension getPreferredSize() {
-                        return new Dimension(800, 500);
+                        return new Dimension(1000, 500);
                     }
 
                     @Override
                     public void paintComponent(Graphics g) {
                         super.paintComponent(g);
-                        Dimension d = chart.getDimension();
-                        if(d==null) {
-                            try {
-                                d=chart.getMinDimension((Graphics2D)g);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
+                        try {
+                            Dimension d = table.getDimension((Graphics2D)g);
+                            Graphics2D g2 = (Graphics2D)((Graphics2D)g).create(0, 0, d.width, d.height);
+                            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                            table.render(g2);
+                            g2.dispose();
+                        } catch(Exception e) {
+                            throw new RuntimeException(e);
                         }
-                        Graphics2D g2 = (Graphics2D)((Graphics2D)g).create(0, 0, d.width, d.height);
-                        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                        chart.draw(g2, new Rectangle(0,0,d.width, d.height));
-                        g2.dispose();
                     }
                 });
                 //Display the window.
