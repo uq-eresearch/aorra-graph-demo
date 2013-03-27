@@ -123,9 +123,8 @@ public class ProgressChart implements Dimensions {
         g2.fill(progressShape);
         g2.setColor(Color.black);
         g2.draw(barShape);
-        g2.setColor(Color.white);
-        g2.setFont(getBarFont());
         if(progressLabel!=null) {
+            g2.setFont(getBarFont());
             if(progressLabelColor != null) {
                 g2.setColor(progressLabelColor);
             } else {
@@ -134,7 +133,7 @@ public class ProgressChart implements Dimensions {
             float x;
             TextAnchor anchor;
             if(progressLabelAlign == null || progressLabelAlign == Align.LEFT) {
-                x = BAR_HEIGHT / 2;
+                x = BAR_HEIGHT / 2f;
                 anchor = TextAnchor.CENTER_LEFT;
             } else {
                 x = BAR_LENGTH - BAR_HEIGHT / 2f;
