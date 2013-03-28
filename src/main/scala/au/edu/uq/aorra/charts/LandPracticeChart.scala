@@ -95,12 +95,8 @@ class LandPracticeChart(val periodLabels: (String,String)) {
       val labelx = barW0 + state.getBarWidth() / 2
       // TODO: does not seem to be correct, but ok for now
       val labely = dataArea.getMinY() + dataArea.getHeight() * .10
-      val angle = GraphUtils.toRadians(-90)
-      g2.setFont(LEGEND_FONT)
-      g2.setColor(Color.WHITE)
+      val angle = -Math.PI/2
       val g = new GraphUtils(g2)
-      val img = g.drawGlowString(
-        label, LEGEND_FONT, Color.black, Color.white, 6)
       val saveT = g2.getTransform()
       val transform = new AffineTransform()
       // jfree chart seem to be using the transform on the Graphics2D object
@@ -110,13 +106,10 @@ class LandPracticeChart(val periodLabels: (String,String)) {
       transform.concatenate(saveT)
       transform.concatenate(
           AffineTransform.getRotateInstance(angle, labelx, labely))
-      // first translate to the center right
-      transform.concatenate(AffineTransform.getTranslateInstance(
-        -img.getWidth(), -img.getHeight() / 2))
       g2.setTransform(transform)
-      val noopTransform = new AffineTransformOp(new AffineTransform(),
-          AffineTransformOp.TYPE_BILINEAR)
-      g2.drawImage(img, noopTransform, labelx.toInt, labely.toInt)
+      g2.setFont(LEGEND_FONT)
+      g2.setColor(Color.black)
+      g.drawGlowString(label, Color.white, 6, labelx.toInt, labely.toInt);
       g2.setTransform(saveT)
     }
 

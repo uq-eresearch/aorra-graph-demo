@@ -17,13 +17,14 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import com.jhlabs.image.GaussianFilter;
+import com.jhlabs.image.GaussianGlowFilter;
 
 
 public class GraphUtils {
@@ -179,46 +180,33 @@ public class GraphUtils {
         g.setColor(color);
     }
 
-    private void drawGlowString(String label, Font font, Color glowColor,
-            Color fontColor, float glowRadius, BufferedImage img1, int xpad, int ypad) {
-        BufferedImage img0 = new BufferedImage(img1.getWidth(), img1.getHeight(), img1.getType());
-        {
-            Graphics2D g0 = img0.createGraphics();
-            g0.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g0.setColor(glowColor);
-            g0.setFont(font);
-            g0.drawString(label, xpad, ypad);
-            g0.dispose();
-        }
-        {
-            Graphics2D g1 = img1.createGraphics();
-            g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            // I have copied the GaussianFilter from the jhlabs page at
-            // http://www.jhlabs.com/ip/blurring.html
-            // According to the Disclaimer the source code can be freely used.
-            GaussianFilter filter = new GaussianFilter(glowRadius);
-            g1.drawImage(img0, filter, 0, 0);
-            g1.setColor(fontColor);
-            g1.setFont(font);
-            g1.drawString(label, xpad, ypad);
-            // TODO DEBUG
-//            g1.setColor(Color.blue);
-//            g1.drawRect(0, 0, img1.getWidth()-1, img1.getHeight()-1);
-            g1.dispose();
-        }
-    }
-
-    public BufferedImage drawGlowString(String label, Font font,
-            Color glowColor, Color fontColor, float glowRadius) {
-        g.setFont(font);
+    public void drawGlowString(String label, Color glowColor, float glowRadius, int x, int y) {
+        Font font = g.getFont();
         FontRenderContext frc = g.getFontRenderContext();
         FontMetrics fm = g.getFontMetrics();
         GlyphVector gv = font.createGlyphVector(frc, label);
         Rectangle2D bounds = gv.getVisualBounds();
         BufferedImage img = new BufferedImage(
-                (int)(bounds.getWidth()+glowRadius+5), fm.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        drawGlowString(label, font, glowColor, fontColor, glowRadius, img, (int)glowRadius/2, fm.getAscent());
-        return img;
+                (int)(bounds.getWidth()+4*glowRadius), fm.getHeight()+(int)(4*glowRadius), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g1 = img.createGraphics();
+        g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g1.setColor(glowColor);
+        g1.setFont(font);
+        int xpad = (int)(2*glowRadius);
+        int ypad = fm.getAscent()+(int)(2*glowRadius);
+        g1.drawString(label, xpad, ypad);
+        new GaussianGlowFilter(glowRadius, glowColor).filter(img, img);
+        g1.setColor(g.getColor());
+        g1.drawString(label, xpad, ypad);
+        // align center right, should be passed in as a parameter really
+        x -= img.getWidth();
+        y -= img.getHeight()/2;
+        AffineTransformOp noopTransform = new AffineTransformOp(new AffineTransform(),
+                AffineTransformOp.TYPE_BILINEAR);
+        g.drawImage(img, noopTransform, x, y);
+        // TODO this does not seem to work with batik
+        // so we still have to draw the label into the image on top of the glow
+        //g.drawString(label, (int)x+xpad, (int)y+ypad);
     }
 
     public static BufferedImage getImage(String name) throws IOException {

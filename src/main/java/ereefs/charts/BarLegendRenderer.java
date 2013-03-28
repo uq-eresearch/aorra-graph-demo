@@ -7,7 +7,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,12 +46,8 @@ public class BarLegendRenderer extends GroupedStackedBarRenderer {
             double labelx = barW0 + state.getBarWidth()/2;
             // TODO does not seem to be correct, but ok for now
             double labely = dataArea.getMinY()+dataArea.getHeight()*.10;
-            double angle = GraphUtils.toRadians(-90);
-            g2.setFont(LEGEND_FONT);
-            g2.setColor(Color.WHITE);
+            double angle = -Math.PI/2;
             GraphUtils g = new GraphUtils(g2);
-            BufferedImage img = g.drawGlowString(
-                    label, LEGEND_FONT, Color.black, Color.white, 6);
             AffineTransform saveT = g2.getTransform();
             AffineTransform transform = new AffineTransform();
             // jfree chart seem to be using the transform on the Graphics2D object 
@@ -61,10 +56,10 @@ public class BarLegendRenderer extends GroupedStackedBarRenderer {
             // our rotation and translation transformations.
             transform.concatenate(saveT);
             transform.concatenate(AffineTransform.getRotateInstance(angle, labelx, labely));
-            // first translate to the center right
-            transform.concatenate(AffineTransform.getTranslateInstance(-img.getWidth(), -img.getHeight()/2));
             g2.setTransform(transform);
-            g2.drawImage(img, null, (int)labelx, (int)labely);
+            g2.setFont(LEGEND_FONT);
+            g2.setColor(Color.black);
+            g.drawGlowString(label, Color.white, 6, (int)labelx, (int)labely);
             g2.setTransform(saveT);
         }
         if((pass == 2) && (row == 7)) {
