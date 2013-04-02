@@ -19,10 +19,24 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import javax.imageio.ImageIO;
+
+import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.svggen.DefaultExtensionHandler;
+import org.apache.batik.svggen.DefaultImageHandler;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
 
 import com.jhlabs.image.GaussianGlowFilter;
 
@@ -31,6 +45,64 @@ public class GraphUtils {
 
     public static enum TextAnchor {
         BASELINE, CENTER;
+    }
+
+    private static interface Graphics2DHelper {
+        Graphics2D getGraphics2D();
+        BufferedImage getImage() throws Exception;
+    }
+
+    private static class DefaultGraphics2DHelper implements Graphics2DHelper {
+        private BufferedImage img;
+
+        public DefaultGraphics2DHelper(int width, int height) {
+            img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        }
+
+        @Override
+        public Graphics2D getGraphics2D() {
+            return img.createGraphics();
+        }
+
+        @Override
+        public BufferedImage getImage() {
+            return img;
+        }
+    }
+
+    private static class SvgGraphics2DHelper implements Graphics2DHelper {
+        private SVGGraphics2D g2;
+        private int width;
+        private int height;
+
+        public SvgGraphics2DHelper(int width, int height) {
+            this.width = width;
+            this.height = height;
+            DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
+            String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+            Document doc = impl.createDocument(svgNS, "svg", null);
+            g2 = new SVGGraphics2D(doc, new DefaultImageHandler(), new DefaultExtensionHandler(), true);
+        }
+
+        @Override
+        public Graphics2D getGraphics2D() {
+            return g2;
+        }
+
+        @Override
+        public BufferedImage getImage() throws Exception {
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
+            Writer out = new OutputStreamWriter(bytes, "UTF-8");
+            g2.stream(out, true);
+            PNGTranscoder t = new PNGTranscoder();
+            TranscoderInput input = new TranscoderInput(new ByteArrayInputStream(bytes.toByteArray()));
+            ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+            TranscoderOutput output = new TranscoderOutput(ostream);
+            t.transcode(input, output);
+            BufferedImage img = ImageIO.read(new ByteArrayInputStream(ostream.toByteArray()));
+            img = img.getSubimage(0, 0, width, height);
+            return img;
+        }
     }
 
     private Graphics2D g;
@@ -181,32 +253,40 @@ public class GraphUtils {
     }
 
     public void drawGlowString(String label, Color glowColor, float glowRadius, int x, int y) {
-        Font font = g.getFont();
-        FontRenderContext frc = g.getFontRenderContext();
-        FontMetrics fm = g.getFontMetrics();
-        GlyphVector gv = font.createGlyphVector(frc, label);
-        Rectangle2D bounds = gv.getVisualBounds();
-        BufferedImage img = new BufferedImage(
-                (int)(bounds.getWidth()+4*glowRadius), fm.getHeight()+(int)(4*glowRadius), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g1 = img.createGraphics();
-        g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g1.setColor(glowColor);
-        g1.setFont(font);
-        int xpad = (int)(2*glowRadius);
-        int ypad = fm.getAscent()+(int)(2*glowRadius);
-        g1.drawString(label, xpad, ypad);
-        new GaussianGlowFilter(glowRadius, glowColor).filter(img, img);
-        g1.setColor(g.getColor());
-        g1.drawString(label, xpad, ypad);
-        // align center right, should be passed in as a parameter really
-        x -= img.getWidth();
-        y -= img.getHeight()/2;
-        AffineTransformOp noopTransform = new AffineTransformOp(new AffineTransform(),
-                AffineTransformOp.TYPE_BILINEAR);
-        g.drawImage(img, noopTransform, x, y);
-        // TODO this does not seem to work with batik
-        // so we still have to draw the label into the image on top of the glow
-        //g.drawString(label, (int)x+xpad, (int)y+ypad);
+        try {
+            Font font = g.getFont();
+            FontRenderContext frc = g.getFontRenderContext();
+            FontMetrics fm = g.getFontMetrics();
+            GlyphVector gv = font.createGlyphVector(frc, label);
+            Rectangle2D bounds = gv.getVisualBounds();
+            Graphics2DHelper helper = newGraphics2D(g, (int)(bounds.getWidth()+4*glowRadius), fm.getHeight()+(int)(4*glowRadius));
+            Graphics2D g1 = helper.getGraphics2D();
+            g1.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g1.setColor(glowColor);
+            g1.setFont(font);
+            int xpad = (int)(2*glowRadius);
+            int ypad = fm.getAscent()+(int)(2*glowRadius);
+            g1.drawString(label, xpad, ypad);
+            BufferedImage img = helper.getImage();
+            new GaussianGlowFilter(glowRadius, Color.white).filter(img, img);
+            // align center right, should be passed in as a parameter really
+            x -= img.getWidth();
+            y -= img.getHeight()/2;
+            AffineTransformOp noopTransform = new AffineTransformOp(new AffineTransform(),
+                    AffineTransformOp.TYPE_BILINEAR);
+            g.drawImage(img, noopTransform, x, y);
+            g.drawString(label, (int)x+xpad, (int)y+ypad);
+        } catch(Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Graphics2DHelper newGraphics2D(Graphics2D src, int width, int height) {
+        if(src instanceof SVGGraphics2D) {
+            return new SvgGraphics2DHelper(width, height);
+        } else {
+            return new DefaultGraphics2DHelper(width, height);
+        }
     }
 
     public static BufferedImage getImage(String name) throws IOException {
