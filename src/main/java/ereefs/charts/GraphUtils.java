@@ -297,10 +297,18 @@ public class GraphUtils {
         return ImageIO.read(in);
     }
 
+    /**
+     * @deprecated use {@link HatchedRectangle} instead because it scales in svg.
+     */
+    @Deprecated
     public static BufferedImage createStripedTexture(Color color) {
         return createHatchingTexture(color, 5, 5);
     }
 
+    /**
+     * @deprecated use {@link HatchedRectangle} instead because it scales in svg.
+     */
+    @Deprecated 
     public static BufferedImage createHatchingTexture(Paint paint, int dash1, int dash2) {
         int size = dash1+dash2;
         BufferedImage result = new BufferedImage(size,size, BufferedImage.TYPE_INT_ARGB);

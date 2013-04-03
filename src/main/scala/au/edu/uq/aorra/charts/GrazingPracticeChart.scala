@@ -136,6 +136,9 @@ class GrazingPracticeChart(val periodLabels: (String,String)) {
   }
 
   def createChart(titleText: String, data: Map[DataKey, Double]) = {
+    val chart = ereefs.charts.GrazingPracticesChart.createChart(titleText, getDataset(data), 
+        periodLabels._1, periodLabels._2)
+    /*
     val chart = ChartFactory.createBarChart(
       "", // chart title
       "", // domain axis label
@@ -191,7 +194,7 @@ class GrazingPracticeChart(val periodLabels: (String,String)) {
     renderer.setShadowVisible(false)
     renderer.setBarPainter(new StandardBarPainter())
     renderer.setMaximumBarWidth(0.08)
-    renderer.setItemMargin(0.01)
+    renderer.setItemMargin(0.01)*/
     chart
   }
 

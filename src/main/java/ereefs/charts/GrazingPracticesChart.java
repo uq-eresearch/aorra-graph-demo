@@ -19,11 +19,10 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
-import java.awt.TexturePaint;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
+import java.awt.geom.RectangularShape;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -36,6 +35,7 @@ import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.entity.EntityCollection;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
@@ -54,7 +54,7 @@ public class GrazingPracticesChart {
 
     private static class CustomBarRenderer extends BarRenderer {
 
-        private static Map<Pair<Integer, Integer>, Color> BAR_COLORS =
+        private static final Map<Pair<Integer, Integer>, Color> BAR_COLORS =
                 new ImmutableMap.Builder<Pair<Integer, Integer>, Color>()
                     .put(Pair.of(0, 0), COLOR_A_TRANS)
                     .put(Pair.of(1, 0), COLOR_A)
@@ -66,12 +66,124 @@ public class GrazingPracticesChart {
                     .put(Pair.of(1, 3), COLOR_D)
                     .build();
 
+        // copied and modified from jfreechart-1.0.14 org.jfree.chart.renderer.category.BarRenderer
+        private void drawItemInternal(Graphics2D g2,
+                CategoryItemRendererState state,
+                Rectangle2D dataArea,
+                CategoryPlot plot,
+                CategoryAxis domainAxis,
+                ValueAxis rangeAxis,
+                CategoryDataset dataset,
+                int row,
+                int column,
+                int pass) {
+
+            // nothing is drawn if the row index is not included in the list with
+            // the indices of the visible rows...
+            int visibleRow = state.getVisibleSeriesIndex(row);
+            if (visibleRow < 0) {
+                return;
+            }
+            // nothing is drawn for null values...
+            Number dataValue = dataset.getValue(row, column);
+            if (dataValue == null) {
+                return;
+            }
+
+            final double value = dataValue.doubleValue();
+            PlotOrientation orientation = plot.getOrientation();
+            double barW0 = calculateBarW0(plot, orientation, dataArea, domainAxis,
+                    state, visibleRow, column);
+            double[] barL0L1 = calculateBarL0L1(value);
+            if (barL0L1 == null) {
+                return;  // the bar is not visible
+            }
+
+            RectangleEdge edge = plot.getRangeAxisEdge();
+            double transL0 = rangeAxis.valueToJava2D(barL0L1[0], dataArea, edge);
+            double transL1 = rangeAxis.valueToJava2D(barL0L1[1], dataArea, edge);
+
+            // in the following code, barL0 is (in Java2D coordinates) the LEFT
+            // end of the bar for a horizontal bar chart, and the TOP end of the
+            // bar for a vertical bar chart.  Whether this is the BASE of the bar
+            // or not depends also on (a) whether the data value is 'negative'
+            // relative to the base value and (b) whether or not the range axis is
+            // inverted.  This only matters if/when we apply the minimumBarLength
+            // attribute, because we should extend the non-base end of the bar
+            boolean positive = (value >= this.getBase());
+            boolean inverted = rangeAxis.isInverted();
+            double barL0 = Math.min(transL0, transL1);
+            double barLength = Math.abs(transL1 - transL0);
+            double barLengthAdj = 0.0;
+            if (barLength > 0.0 && barLength < getMinimumBarLength()) {
+                barLengthAdj = getMinimumBarLength() - barLength;
+            }
+            double barL0Adj = 0.0;
+            RectangleEdge barBase;
+            if (orientation == PlotOrientation.HORIZONTAL) {
+                if (positive && inverted || !positive && !inverted) {
+                    barL0Adj = barLengthAdj;
+                    barBase = RectangleEdge.RIGHT;
+                }
+                else {
+                    barBase = RectangleEdge.LEFT;
+                }
+            }
+            else {
+                if (positive && !inverted || !positive && inverted) {
+                    barL0Adj = barLengthAdj;
+                    barBase = RectangleEdge.BOTTOM;
+                }
+                else {
+                    barBase = RectangleEdge.TOP;
+                }
+            }
+
+            // draw the bar...
+            RectangularShape bar = null;
+            if (orientation == PlotOrientation.HORIZONTAL) {
+                bar = getBarShape(row, barL0 - barL0Adj, barW0,
+                        barLength + barLengthAdj, state.getBarWidth());
+            }
+            else {
+                bar = getBarShape(row, barW0, barL0 - barL0Adj,
+                        state.getBarWidth(), barLength + barLengthAdj);
+            }
+
+            if (getShadowsVisible()) {
+                this.getBarPainter().paintBarShadow(g2, this, row, column, bar, barBase,
+                        true);
+            }
+            this.getBarPainter().paintBar(g2, this, row, column, bar, barBase);
+
+//          FIXME
+//            CategoryItemLabelGenerator generator = getItemLabelGenerator(row,
+//                    column);
+//            if (generator != null && isItemLabelVisible(row, column)) {
+//                drawItemLabel(g2, dataset, row, column, plot, generator, bar,
+//                        (value < 0.0));
+//            }
+
+            // submit the current data point as a crosshair candidate
+            int datasetIndex = plot.indexOf(dataset);
+            updateCrosshairValues(state.getCrosshairState(),
+                    dataset.getRowKey(row), dataset.getColumnKey(column), value,
+                    datasetIndex, barW0, barL0, orientation);
+
+            // add an item entity, if this information is being collected
+            EntityCollection entities = state.getEntityCollection();
+            if (entities != null) {
+                addItemEntity(entities, dataset, row, column, bar);
+            }
+
+        }
+
         @Override
         public void drawItem(Graphics2D g2, CategoryItemRendererState state,
                 Rectangle2D dataArea, CategoryPlot plot,
                 CategoryAxis domainAxis, ValueAxis rangeAxis,
                 CategoryDataset dataset, int row, int column, int pass) {
-            super.drawItem(g2, state, dataArea, plot, domainAxis, rangeAxis, dataset, row,
+            drawItemInternal(g2, state, dataArea, plot, domainAxis, rangeAxis, dataset, row,
                     column, pass);
 //            System.out.println(String.format("row %s, column %s, pass %s", row, column, pass));
             if((pass == 0) && (row == 1)&& (column == 3)) {
@@ -87,33 +199,36 @@ public class GrazingPracticesChart {
         
         @Override
         public Paint getItemPaint(int row, int column) {
-            Color color = BAR_COLORS.get(Pair.of(row, column));
+            return BAR_COLORS.get(Pair.of(row, column));
+        }
+
+        private RectangularShape getBarShape(int row,
+                double x, double y, double width, double height) {
             if(row == 0) {
-                BufferedImage striped = GraphUtils.createStripedTexture(color);
-                Rectangle2D anchor = new Rectangle2D.Double(0, 0, striped.getWidth(), striped.getHeight());
-                return new TexturePaint(striped, anchor);
+                return new HatchedRectangle(x, y, width, height, 5, 5);
             } else {
-                return color;
+                return new Rectangle2D.Double(x, y, width, height);
             }
         }
     }
 
-    private static LegendTitle createLegend() {
+    private static LegendTitle createLegend(String legend1Text, String legend2Text) {
         final LegendItemCollection legendItems = new LegendItemCollection();
         FontRenderContext frc = new FontRenderContext(null, true, true);
         Font legenfont = new Font(Font.SANS_SERIF, Font.BOLD, 12);
         GlyphVector gv = legenfont.createGlyphVector(frc, new char[] {'X', 'X'});
         Shape shape = gv.getVisualBounds();
+        Rectangle2D bounds = shape.getBounds2D();
+        HatchedRectangle hatchShape = new HatchedRectangle(bounds.getX(), bounds.getY(),
+                bounds.getWidth(), bounds.getHeight(), 5, 5);
         {
-            BufferedImage striped = GraphUtils.createStripedTexture(Color.black);
-            Rectangle2D anchor = new Rectangle2D.Double(0, 0, striped.getWidth(), striped.getHeight());
-            LegendItem li = new LegendItem("2008-2009", null, null, null,
-                    shape, new TexturePaint(striped, anchor));
+            LegendItem li = new LegendItem(legend1Text, null, null, null, hatchShape, Color.black);
             li.setLabelFont(legenfont);
             legendItems.add(li);
+
         }
         {
-            LegendItem li = new LegendItem("2009-2010", null, null, null, shape, Color.black);
+            LegendItem li = new LegendItem(legend2Text, null, null, null, shape, Color.black);
             li.setLabelFont(legenfont);
             legendItems.add(li);
         }
@@ -131,6 +246,11 @@ public class GrazingPracticesChart {
     }
 
     public static JFreeChart createChart(CategoryDataset dataset) {
+        return createChart("Grazing pratices", dataset, "2008-2009", "2009-2010");
+    }
+
+    public static JFreeChart createChart(String titleText, CategoryDataset dataset,
+            String legend1Text, String legend2Text) {
         JFreeChart chart = ChartFactory.createBarChart(
                 "",  // chart title
                 "",  // domain axis label
@@ -141,10 +261,10 @@ public class GrazingPracticesChart {
                 true,                        // tooltips
                 false                        // urls
                 );
-        TextTitle title = new TextTitle("Grazing practices", TITLE_FONT);
+        TextTitle title = new TextTitle(titleText, TITLE_FONT);
         title.setPadding(new RectangleInsets(10,0,0,0));
         chart.setTitle(title);
-        chart.addLegend(createLegend());
+        chart.addLegend(createLegend(legend1Text, legend2Text));
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
         plot.setBackgroundPaint(Color.white);
         plot.setOutlineVisible(false);
