@@ -10,7 +10,7 @@ object AorraGraphDemoBuild extends Build {
   val Organization = "au.edu.uq"
   val Name = "AORRA Graph Demo"
   val Version = "0.2.0-SNAPSHOT"
-  val ScalaVersion = "2.10.0"
+  val ScalaVersion = "2.10.1"
   val ScalatraVersion = "2.2.0"
   val BatikVersion = "1.7"
 
