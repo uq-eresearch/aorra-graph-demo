@@ -22,6 +22,9 @@ object AorraGraphDemoBuild extends Build {
       name := Name,
       version := Version,
       scalaVersion := ScalaVersion,
+      // All source code is UTF-8 (and not always ASCII 7-bit)
+      javaOptions ++= Seq("-Dfile.encoding=UTF8"),
+      javacOptions ++= Seq("-encoding", "UTF8"),
       resolvers += "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
       libraryDependencies ++= Seq(
         "org.scalatra" %% "scalatra" % ScalatraVersion,
