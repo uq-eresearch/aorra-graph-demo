@@ -1,0 +1,60 @@
+<table>
+    <theme1>#ABA998</theme1>
+    <theme2>#676651</theme2>
+    <catchment>
+        <name>Black</name>
+        <wetland condition="verypoor">0.5</wetland>
+        <riparian condition="verypoor">0.5</riparian>
+        <groundcover condition="poor">80</groundcover>
+    </catchment>
+    <catchment>
+        <name>Burdekin</name>
+        <wetland condition="good">0.5</wetland>
+        <riparian condition="verypoor">0.5</riparian>
+        <groundcover condition="poor">80</groundcover>
+    </catchment>
+    <catchment>
+        <name>Don</name>
+        <wetland condition="moderate">0.5</wetland>
+        <riparian condition="verypoor">0.5</riparian>
+        <groundcover condition="moderate">81</groundcover>
+    </catchment>
+     
+    <catchment>
+        <name>Haughton</name>
+        <wetland condition="good">-0.5</wetland>
+        <riparian condition="verypoor">0.5</riparian>
+        <groundcover condition="poor">80</groundcover>
+    </catchment>
+    <catchment>
+        <name>Ross</name>
+        <wetland condition="verygood">0.5</wetland>
+        <riparian condition="verypoor">0.5</riparian>
+        <groundcover condition="poor">80</groundcover>
+    </catchment>
+    <aip>
+        <Grazing condition="good">22</Grazing>
+        <Horticulture condition="verygood">20</Horticulture>
+        <Sugarcane condition="moderate">19</Sugarcane>
+        <!-- 
+        <Grain condition="poor_hatching">9</Grain>
+         -->
+    </aip>
+    <loss>
+        <Wetlands condition="good">0.5</Wetlands>
+        <Riparian condition="verypoor">0.5</Riparian>
+    </loss>
+    <groundcover condition="poor">80</groundcover>
+    <load>
+        <Nitrogen condition="moderate">7</Nitrogen>
+        <Phosphorus condition="good">8</Phosphorus>
+        <Sediment condition="verygood">3</Sediment>
+        <Pesticides condition="verygood">14</Pesticides>
+    </load>
+    <marine condition="poor">
+        <Water condition="moderate"/>
+        <Seagrass condition="poor"/>
+        <Corals condition="verypoor"/>
+    </marine>
+    <legend>default</legend>
+</table>

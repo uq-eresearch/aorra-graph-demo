@@ -12,7 +12,7 @@ import au.edu.uq.aorra.charts.{
   ChartData, ChartRenderer, GrazingPracticeChart, LandPracticeChart, SvgWrapper}
 import ereefs.charts.{
   CategoryDatasetBuilder, ChartContentWrapper,
-  DimensionsWrapper, ProgressChart, ProgressChartBuilder}
+  DimensionsWrapper, ProgressChart, ProgressChartBuilder, RegionalStatusTable}
 import ereefs.images._
 import java.util.NoSuchElementException
 import ereefs.charts.BeerCoaster
@@ -60,6 +60,12 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
 
   get("/progress-chart.:format") {
     val f = progressChart.toFormat(params("format"))
+    f.mimetype foreach { contentType = _ }
+    f.output getOrElse halt(400, "Unsupported image format requested.")
+  }
+
+  get("/status-table.:format") {
+    val f = statusTable.toFormat(params("format"))
     f.mimetype foreach { contentType = _ }
     f.output getOrElse halt(400, "Unsupported image format requested.")
   }
@@ -148,6 +154,29 @@ class AorraGraphDemo extends ScalatraFilter with ScalateSupport {
     g2.dispose
 
     cw.toString()
+  }
+
+  private def statusTable() = {
+    val statusTable = new RegionalStatusTable()
+    val impl = SVGDOMImplementation.getDOMImplementation()
+    val svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI
+    val doc = impl.createDocument(svgNS, "svg", null).asInstanceOf[SVGDocument]
+
+    // Create an instance of the SVG Generator.
+    val g2 = new SVGGraphics2D(doc,
+        new DefaultImageHandler(),
+        new DefaultExtensionHandler(),
+        true
+    )
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+    val d = statusTable.getMinDimension(g2);
+    statusTable.draw(g2, new Rectangle2D.Double(0, 0, d.width, d.height))
+    g2.setSVGCanvasSize(d)
+    val cw = new CharArrayWriter()
+    g2.stream(cw, true)
+    g2.dispose
+    val svg = cw.toString()
+    SvgWrapper(svg, params.getAs[Int]("width"), params.getAs[Int]("height"))
   }
 
   private def paramOrBlank(k: String) = try {

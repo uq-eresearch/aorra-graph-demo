@@ -592,6 +592,43 @@
         </div>
       </fieldset>
     </form>
+    <form id="status-table" class="form-horizontal">
+      <fieldset>
+        <legend>Progress and Status Table</legend>
+      </fieldset>
+      <div class="row">
+        <div class="span6">
+          <div class="control-group">
+            <div class="control-group">
+              <div class="controls">
+                <button class="btn" type="submit">
+                  <i class="icon-bar-chart"> </i>
+                  Render
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="span6">
+          <div class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+              <img class="png"/>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="pdf" href="#">
+                <i class="icon-file-alt"> </i>PDF</a>
+              </li>
+              <li><a class="png" href="#">
+                <i class="icon-picture"> </i>Large PNG</a>
+              </li>
+              <li><a class="svg" href="#">
+                <i class="icon-file"> </i>SVG</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </form>
     <script type="text/javascript">
     $('form').submit(function() {
       var $img = $(this).find('img.png');

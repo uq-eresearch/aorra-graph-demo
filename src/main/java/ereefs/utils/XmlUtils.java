@@ -1,7 +1,9 @@
 package ereefs.utils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
@@ -12,9 +14,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -90,6 +95,16 @@ public class XmlUtils {
                 result.put(map.item(i).getNodeName(), map.item(i).getNodeValue());
             }
         }
+        return result;
+    }
+
+    public static Document xslt(InputStream stylesheet, Document input) throws FileNotFoundException,
+    TransformerException, ParserConfigurationException  {
+        TransformerFactory tFactory = TransformerFactory.newInstance();
+        Transformer transformer = tFactory.newTransformer(new StreamSource(stylesheet));
+        Document result = newDocument();
+        DOMResult domResult = new DOMResult(result); 
+        transformer.transform(new DOMSource(input), domResult);
         return result;
     }
 }

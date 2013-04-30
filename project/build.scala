@@ -4,7 +4,6 @@ import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
 import com.mojolly.scalate.ScalatePlugin._
 import ScalateKeys._
-import com.typesafe.sbt.SbtStartScript
 
 object AorraGraphDemoBuild extends Build {
   val Organization = "au.edu.uq"
@@ -17,7 +16,7 @@ object AorraGraphDemoBuild extends Build {
   lazy val project = Project (
     "aorra-graph-demo",
     file("."),
-    settings = Defaults.defaultSettings ++ seq(SbtStartScript.startScriptForClassesSettings: _*) ++ ScalatraPlugin.scalatraWithJRebel ++ scalateSettings ++ Seq(
+    settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ scalateSettings ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
@@ -41,7 +40,9 @@ object AorraGraphDemoBuild extends Build {
         "org.apache.xmlgraphics" % "batik-codec" % BatikVersion,
         "org.apache.xmlgraphics" % "batik-rasterizer" % BatikVersion,
         "org.apache.xmlgraphics" % "batik-svggen" % BatikVersion,
-        "org.apache.xmlgraphics" % "fop" % "1.0"
+        "org.apache.xmlgraphics" % "fop" % "1.0",
+        "org.apache.poi" % "poi" % "3.8",
+        "org.apache.poi" % "poi-ooxml" % "3.8"
       ),
       scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(

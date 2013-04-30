@@ -65,9 +65,13 @@ public class Parser {
     }
 
     public Box parse(InputStream in) throws Exception {
-        cssrules = Lists.newArrayList();
         Document doc = XmlUtils.parse(new InputSource(in));
-        Element elRoot = doc.getDocumentElement();
+        return parse(doc);
+    }
+
+    public Box parse(Document xhtml) throws Exception {
+        cssrules = Lists.newArrayList();
+        Element elRoot = xhtml.getDocumentElement();
         return parse(null, elRoot);
     }
 
