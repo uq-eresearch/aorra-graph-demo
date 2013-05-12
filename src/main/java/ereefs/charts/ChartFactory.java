@@ -1,25 +1,56 @@
 package ereefs.charts;
 
-import java.awt.Dimension;
+import java.util.List;
+import java.util.Map;
 
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.CategoryDataset;
+import com.google.common.collect.Lists;
+
+import ereefs.spreadsheet.DataSource;
+import ereefs.spreadsheet.Marine;
 
 public class ChartFactory {
 
-    public static Dimensions getGrazingPracticeChart(Dimension dimension, CategoryDataset dataset) {
-        JFreeChart chart = GrazingPracticesChart.createChart(dataset);
-        return new DimensionsWrapper(chart, dimension);
+    private List<DataSource> datasources;
+
+    public ChartFactory() {
     }
 
-    public static Dimensions getHorticulturePracticeChart(Dimension dimension, CategoryDataset dataset) {
-        JFreeChart chart = HorticulturePracticeChart.createChart(dataset);
-        return new DimensionsWrapper(chart, dimension);
+    public ChartFactory(List<DataSource> datasources) {
+        this.datasources = datasources;
     }
 
-    public static Dimensions getSugarcanePracticeChart(Dimension dimension, CategoryDataset dataset) {
-        JFreeChart chart = SugarcanePracticeChart.createChart(dataset);
-        return new DimensionsWrapper(chart, dimension);
+    public List<Chart> getCharts(ChartType type, Map<String, String[]> properties) {
+        List<Chart> result = Lists.newArrayList();
+        for(ChartType t : ChartType.values()) {
+            if((type == null) || type.equals(t)) {
+                if(t.equals(ChartType.MARINE)) {
+                    result.addAll(getMarineCharts(properties));
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<Chart> getCharts(Map<String, String[]> properties) {
+        return getCharts(null, properties);
+    }
+
+    private List<Chart> getMarineCharts(Map<String, String[]> properties) {
+        List<Chart> result = Lists.newArrayList();
+        if(datasources != null) {
+            for(DataSource datasource : datasources) {
+                if(Marine.isMarineSpreadsheet(datasource)) {
+                    Marine marine = new Marine(datasource);
+                    result.addAll(marine.getCharts(properties));
+                }
+            }
+        }
+        return result;
+    }
+
+    private String getProperty(Map<String, String[]> properties, String key) {
+        String[] values = properties.get(key);
+        return ((values != null) && (values.length > 0))?values[0]:null;
     }
 
 }

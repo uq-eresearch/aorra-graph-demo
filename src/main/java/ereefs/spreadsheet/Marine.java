@@ -10,18 +10,19 @@ import ereefs.charts.BeerCoaster;
 import ereefs.charts.Chart;
 import ereefs.charts.ChartDescription;
 import ereefs.charts.ChartType;
+import ereefs.charts.Region;
 
 public class Marine {
 
-    private static final ImmutableMap<String, Integer> OFFSETS =
-            new ImmutableMap.Builder<String, Integer>()
-                .put("Cape York", 0)
-                .put("Wet Tropics", 1)
-                .put("Burdekin", 2)
-                .put("Mackay Whitsundays", 3)
-                .put("Fitzroy", 4)
-                .put("Burnett Mary", 5)
-                .put("GBR", 6)
+    private static final ImmutableMap<Region, Integer> OFFSETS =
+            new ImmutableMap.Builder<Region, Integer>()
+                .put(Region.CAPE_YORK, 0)
+                .put(Region.WET_TROPICS, 1)
+                .put(Region.BURDEKIN, 2)
+                .put(Region.MACKAY_WHITSUNDAYS, 3)
+                .put(Region.FITZROY, 4)
+                .put(Region.BURNETT_MARY, 5)
+                .put(Region.GBR, 6)
                 .build();
 
     private DataSource datasource;
@@ -33,14 +34,14 @@ public class Marine {
     public List<Chart> getCharts(Map<String, String[]> properties) {
         List<Chart> result = Lists.newArrayList();
         if(isMarineSpreadsheet()) {
-            String region = getRegion(properties);
+            Region region = getRegion(properties);
             if(region != null) {
                 Chart chart = getChart(region);
                 if(chart != null) {
                     result.add(chart);
                 }
             } else {
-                for(String r : OFFSETS.keySet()) {
+                for(Region r : OFFSETS.keySet()) {
                     Chart chart = getChart(r);
                     if(chart != null) {
                         result.add(chart);
@@ -59,26 +60,34 @@ public class Marine {
         }
     }
 
-    private Chart getChart(String region) {
+    public static boolean isMarineSpreadsheet(DataSource datasource) {
+        try {
+            return "MARINE SUMMARY".equalsIgnoreCase(datasource.select("Summary!B18").format("value"));
+        } catch(Exception e) {
+            return false;
+        }
+    }
+
+    private Chart getChart(Region region) {
         BeerCoaster beercoaster = getDrawable(region);
         if(beercoaster != null) {
             return new Chart(new ChartDescription(
-                    ChartType.MARINE, ImmutableMap.of("region", region)), beercoaster);
+                    ChartType.MARINE, ImmutableMap.of("region", region.getName())), beercoaster);
         } else {
             return null;
         }
     }
 
-    private String getRegion(Map<String, String[]> properties) {
+    private Region getRegion(Map<String, String[]> properties) {
         String[] regions = properties.get("region");
         if(regions!=null && (regions.length > 0)) {
-            return regions[0];
+            return Region.getRegion(regions[0]);
         } else {
             return null;
         }
     }
 
-    private BeerCoaster getDrawable(String region) {
+    private BeerCoaster getDrawable(Region region) {
         try {
             Integer offset = OFFSETS.get(region);
             if(offset == null) {
