@@ -48,9 +48,4 @@ public class ChartFactory {
         return result;
     }
 
-    private String getProperty(Map<String, String[]> properties, String key) {
-        String[] values = properties.get(key);
-        return ((values != null) && (values.length > 0))?values[0]:null;
-    }
-
 }

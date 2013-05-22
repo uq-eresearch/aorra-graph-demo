@@ -34,11 +34,13 @@ public class Marine {
     public List<Chart> getCharts(Map<String, String[]> properties) {
         List<Chart> result = Lists.newArrayList();
         if(isMarineSpreadsheet()) {
-            Region region = getRegion(properties);
-            if(region != null) {
-                Chart chart = getChart(region);
-                if(chart != null) {
-                    result.add(chart);
+            List<Region> regions = getRegion(properties);
+            if(regions != null && !regions.isEmpty()) {
+                for(Region region : regions) {
+                    Chart chart = getChart(region);
+                    if(chart != null) {
+                        result.add(chart);
+                    }
                 }
             } else {
                 for(Region r : OFFSETS.keySet()) {
@@ -53,11 +55,7 @@ public class Marine {
     }
 
     public boolean isMarineSpreadsheet() {
-        try {
-            return "MARINE SUMMARY".equalsIgnoreCase(datasource.select("Summary!B18").format("value"));
-        } catch(Exception e) {
-            return false;
-        }
+        return isMarineSpreadsheet(datasource);
     }
 
     public static boolean isMarineSpreadsheet(DataSource datasource) {
@@ -78,13 +76,18 @@ public class Marine {
         }
     }
 
-    private Region getRegion(Map<String, String[]> properties) {
+    private List<Region> getRegion(Map<String, String[]> properties) {
+        List<Region> result = Lists.newArrayList();
         String[] regions = properties.get("region");
         if(regions!=null && (regions.length > 0)) {
-            return Region.getRegion(regions[0]);
-        } else {
-            return null;
+            for(String r : regions) {
+                Region region = Region.getRegion(r);
+                if(region != null) {
+                    result.add(region);
+                }
+            }
         }
+        return result;
     }
 
     private BeerCoaster getDrawable(Region region) {
